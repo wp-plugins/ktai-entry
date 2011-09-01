@@ -1,0 +1,158 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.9.0\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2010-01-07 04:16+0900\n"
+"Last-Translator: IKEDA Yuriko <yuriko-poedit@yuriko.net>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Poedit-Language: Japanese\n"
+"X-Poedit-Country: JAPAN\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-KeywordsList: __;_e;_x:2c,1;_n:1,2;_n_noop:1,2;_c;__ngettext:1,2;__ngettext_noop:1,2\n"
+
+# ----- ktai_entry.php --------------------------------------------------
+msgid "http://wordpress.org/extend/plugins/ktai-entry/"
+msgstr "http://wppluginsj.sourceforge.jp/ktai_entry/"
+
+msgid "Create a new post from a mail message sent by mobile phones."
+msgstr "携帯電話からのメールで新規に投稿を行います。"
+
+msgid "IKEDA Yuriko"
+msgstr "池田百合子"
+
+msgid "http://en.yuriko.net/"
+msgstr "http://www.yuriko.net/cat/wordpress/"
+
+msgid "New post on your blog."
+msgstr "ブログに新規投稿がありました。"
+
+msgid "Title: %s"
+msgstr "タイトル: %s"
+
+msgid "Author: %s"
+msgstr "投稿者: %s"
+
+msgid "[%1$s] New Post: \"%2$s\""
+msgstr "[%1$s] 新規投稿: \"%2$s\""
+
+msgid "You can see the post here:"
+msgstr "次の URL で投稿が見られます:"
+
+msgid "Edit it: %s"
+msgstr "編集する: %s"
+
+msgid "Once per two minutes"
+msgstr "2分に1回"
+
+msgid "Once per five minutes"
+msgstr "5分に1回"
+
+msgid "Once per ten minutes"
+msgstr "10分に1回"
+
+msgid "Once per fifteen minutes"
+msgstr "15分に1回"
+
+msgid "Once per twenty minutes"
+msgstr "20分に1回"
+
+msgid "Once per half an hour"
+msgstr "30分に1回"
+
+msgid "Once an hour"
+msgstr "1時間に1回"
+
+msgid "Post by Email"
+msgstr "メールで投稿"
+
+msgid "Ktai Entry Configuration"
+msgstr "Ktai Entry 設定"
+
+msgid "Note: To configure POP3 mail server, go <a href=\"options-writing.php\">Writing Options</a>."
+msgstr "※POP3 メールサーバーの設定は、<a href=\"options-writing.php\">投稿設定</a>で行なってください。"
+
+msgid "Mail Server"
+msgstr "メールサーバー"
+
+msgid "Port"
+msgstr "ポート"
+
+msgid "Login Name"
+msgstr "ログイン名"
+
+msgid "Password"
+msgstr "パスワード"
+
+msgid "Server Option"
+msgstr "サーバーオプション"
+
+msgid "Use APOP"
+msgstr "APOP を使用"
+
+msgid "POP3 retrieve interval"
+msgstr "POP3 読み込み間隔"
+
+msgid "Never"
+msgstr "しない"
+
+msgid "2 min"
+msgstr "2分"
+
+msgid "5 min"
+msgstr "5分"
+
+msgid "10 min"
+msgstr "10分"
+
+msgid "15 min"
+msgstr "15分"
+
+msgid "20 min"
+msgstr "20分"
+
+msgid "30 min"
+msgstr "30分"
+
+msgid "1 hour"
+msgstr "1時間"
+
+msgid "min"
+msgstr "分"
+
+msgid "<a href=\"%s\">Retrieve messages now</a>."
+msgstr "<a href=\"%s\">すぐにメッセージを読み出す。</a>"
+
+msgid "Posting mail address (option)"
+msgstr "投稿受付メールアドレス (オプション)"
+
+msgid "Reject all mail whose recipients (To: fields) are not this address. DO NOTE write sender addresses."
+msgstr "宛先 (To フィールド) がこのアドレスでないメールは拒否します。差出人アドレスを書いてはいけません。"
+
+msgid "Image position of inserting into post"
+msgstr "投稿に挿入する画像の配置"
+
+msgid "Image size of inserting into post"
+msgstr "投稿に挿入する画像サイズ"
+
+msgid "Post template if attachment images"
+msgstr "投稿テンプレート (添付画像があるとき)"
+
+msgid "{text}: Body text, {images}: sequence of images, {alignment}: Alignment for images"
+msgstr "{text}: 本文テキスト、{images}: 画像の繰り返し、{alignment}: 画像の配置方法"
+
+msgid "Notify publish to admin"
+msgstr "投稿を管理者に通知"
+
+msgid "Delete Options"
+msgstr "オプションの削除"
+
+msgid "Delete option values and revert them to default &raquo;"
+msgstr "オプション値を削除してデフォルトに戻す &raquo;"
+
+msgid "Options Deleted."
+msgstr "オプションを削除しました。"
+
