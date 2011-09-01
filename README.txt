@@ -18,7 +18,7 @@ Stable tag: 0.9.0
 * Supports to change post slug and post stagus.
 * Supports to specify post date by test string, or the date of attached JPEG image.
 * Supports to rotate attached images.
-* Supports to include pictograms of Japanese mobile phones of all five carreers (NTT docomo, KDDI au, SoftBank, WILLCOM, EMOBILE). Pictograms are stored HTML like <img localsrc="NNNN" />: format of Ktai Style (Mobile view plugin).
+* Supports to include pictograms of Japanese mobile phones of all five carreers (NTT docomo, KDDI au, SoftBank, WILLCOM, EMOBILE). Pictograms are stored HTML like `<img localsrc="NNNN" />`: format of Ktai Style (Mobile view plugin).
 
 You can choose two ways of sending mail:
 
@@ -31,6 +31,7 @@ You can choose two ways of sending mail:
 * PHP 5.1 or later (NOT support PHP 4.x!!)
 
 (Only for Kicking the posting script)
+
 * The mail server provides editing .forward/.qmail/.procmail to kick the posting script when mail messages are arrived.
 
 == Installation ==
@@ -103,6 +104,7 @@ If you use Gmail to the external mailbox, like below:
 1. Make a random string. You can use a string displayed at "Post via Mail" section of WordPress admin panel. And, substitute upper character and punctuations from it. (e.g. `aBM9dDu*^w$R` -> `abm9dduwr`). Then chain the local part of your Gmail address and this random string with plus sign, and new address is made. (e.g. `example@gmail.com` and `abm9dduwr` results `example+abm9dduwr@gmail.com`.
 1. Put the new address in "Posting mail address" field. Therefore, only the message posted to the address having random string (e.g. `example+abm9dduwr@gmail.com`) is accepted, normal address (e.g. `example@gmail.com`) is rejected.
 1. Configure "Post via Email" of "Writing" settings like below:
+
    * Mail Server: ssl://pop.gmail.com
    * Port: 995
    * Login Name: (Your Gmail adress) e.g. example@gmail.com
