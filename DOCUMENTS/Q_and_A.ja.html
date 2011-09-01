@@ -15,11 +15,13 @@ dt {font-weight:bold; background: #ffcccc; margin-right:25%;}
 dd {margin-bottom:0.5em;}
 li {line-height:1.5em;}
 .navi {text-align:center;}
+strong, del {background-color:#ccc;}
+pre {color:#230;padding:3px;border:solid gray 1px;line-height:100%;}
 </style>
 </head>
 <body>
 <h1>Ktai Entry マニュアル</h1>
-<p class="navi">[ <a href="README.ja.html">はじめに</a> | <a href="Q_and_A.ja.html">よくある質問と答え</a> | <a href="ERRORS.ja.html">エラーメッセージ</a> ]</p>
+<p class="navi">[ <a href="../README.ja.html">はじめに</a> | <a href="Q_and_A.ja.html">よくある質問と答え</a> | <a href="ERRORS.ja.html">エラーメッセージ</a> ]</p>
 
 <h2>よくある質問と答え</h2>
 <p>Ktai Entry に関して、附属ドキュメントに掲載されていない疑問点やノウハウなどを掲載します。ここにない質問があれば、まず、附属ドキュメントをよく読んでみてください。それでも解決できなければ、作者にメールするか、WordPress 日本語フォーラム の「<a href="http://ja.forums.wordpress.org/forum/5">プラグイン</a>」で質問してください。</p>
@@ -29,17 +31,17 @@ li {line-height:1.5em;}
 <dt id="fatal">プラグインを有効にすると "Fatal Error" になる</dt>
 <dd>サーバーの PHP バージョンが 5.0.0 以降であるか確認してください。Ktai Entry は PHP 4 には対応していません。以下のエラーが出るときは確実にサーバーの PHP が 4.x です。
 <pre>Parse error: syntax error, unexpected T_STRING, expecting T_OLD_FUNCTION or T_FUNCTION or T_VAR or ‘}’
-in /****/wp-content/plugins/ktai_entry/ktai_entry.php on line 73</pre>
+in /****/wp-content/plugins/ktai-entry/ktai_entry.php on line 63</pre>
 サーバーが PHP5 を提供していても、自身が利用しているサービス／ドメイン名では PHP4 のままであることも多いので、よく確認してください。</dd>
 <dt id="prefpane">管理画面の設定をどう変更すればいいか分からない</dt>
 <dd>管理画面の「メール投稿」での設定は変更しなくてもそのまま使えます。メールサーバーの設定さえきちんと行えばデフォルトで動くように設計されています。</dd>
 <dt id="cron">外部メールボックスの読み込みを cron で行なわせたい</dt>
 <dd>手動でメールボックス確認させる スクリプト retrieve.php をウェブ経由でアクセスする (wget コマンド等) 場合は _wpnonce 引数が必須ですが、コマンドライン版 PHP で retrieve.php を起動させる場合は不要です。このため、crontab は以下のように記述してください。なお、/PATH/TO の部分は適宜修正してください。
-<pre>2,17,32,47 * * * * /usr/bin/php /PATH/TO/retrieve.php</pre>
+<pre>2,17,32,47 * * * * /usr/bin/php /PATH/TO/WP/wp-content/plugins/ktai-entry/inc/retrieve.php</pre>
 ※0,15,30,45 ではないのは、他の cron ジョブが使わなさそうな時刻にするためです。<br />
 ※"retrieve" のスペルは間違えやすいので、十分注意してください。</dd>
 <dt id="safemode">PHP がセーフモードで動作している場合、どうすればいいか</dt>
-<dd>PHP がセーフモードで動作している場合、添付ファイルが WordPress にアップロードされないことがあります。あらかじめ、日付別のアップロードフォルダー ( wp-content/uploads/2009/01/ など) を作っておくか、ktai_entry/post.php だけを CGI 動作させるように設定してください。例えば、xrea の場合、「<a href="http://sb.xrea.com/showthread.php?t=10744">PHPをCGIとして動かす方法について</a>」を参照ください。</dd>
+<dd>PHP がセーフモードで動作している場合、添付ファイルが WordPress にアップロードされないことがあります。あらかじめ、日付別のアップロードフォルダー ( wp-content/uploads/2009/01/ など) を作っておくか、ktai-entry/inc/post.php だけを CGI 動作させるように設定してください。例えば、xrea の場合、「<a href="http://sb.xrea.com/showthread.php?t=10744">PHPをCGIとして動かす方法について</a>」を参照ください。</dd>
 </dl>
 
 <h3 id="spec">仕様に関して</h3>
@@ -68,7 +70,7 @@ in /****/wp-content/plugins/ktai_entry/ktai_entry.php on line 73</pre>
 </ul>
 残念ながら、これ以外の場合は、メールをインターネットに中継する時点で絵文字を〓 (ゲタ)、? (はてな) やテキスト ([人差し指] など) に変換してしまいます。メールサーバーに到着した時点で絵文字は失なわれていて、Ktai Entry では認識できないため、絵文字投稿はできません。</dd>
 <dt id="logmessage">ログを日本語化したい</dt>
-<dd>ログ機構は、文字化けして内容が読めなくなることを防ぐため、デフォルトでは英語としていますが、ktai_entry.php の 77 行目のコメントを外して「<code>$this-&gt;load_textdomain('ktai_entry_log', 'lang');</code>」を有効にすると日本語化できます。文字コードはウェブログの文字コード (UTF-8 等) と同じです。ただし、メールサーバーに返答するためのメッセージ、および外部のメールボックスから返されたメッセージは英語のままです。</dd>
+<dd>ログ機構は、文字化けして内容が読めなくなることを防ぐため、デフォルトでは英語としていますが、ktai_entry.php の 101 行目のコメントを外して「<code>load_plugin_textdomain('ktai_entry_log', false, ...</code>」を有効にすると日本語化できます。文字コードはウェブログの文字コード (UTF-8 等) と同じです。ただし、メールサーバーに返答するためのメッセージ、および外部のメールボックスから返されたメッセージは英語のままです。</dd>
 </dl>
 
 <h3 id="trouble">問題が発生したときは</h3>
@@ -85,7 +87,7 @@ in /****/wp-content/plugins/ktai_entry/ktai_entry.php on line 73</pre>
 <li>メール着信で投稿スクリプト inject.php を起動させる方式の場合、inject.php へのパスが正しいか確認してください。<code>| /usr/bin/php /PATH/TO/inject.php</code> ではなく、<code>| /PATH/TO/inject.php</code> としないと動かない場合があります。この場合は、inject.php の先頭に <code>#! /usr/bin/php</code> を記載し、かつ、実行権限を与えてください。</li>
 <li>inject.php を起動させる方式の場合、および cron で retrieve.php を起動させた場合、CLI 版の PHP バージョンを確認してください。サーバーによっては、Apache モジュール版 PHP が 5.0 以降であっても、CLI 版が 4.x であるという場合もあり得ます。CLI 版 PHP をアップグレードしてください。</li>
 </ul>
-原因が不明の場合、ktai_entry.php の 27,28 行目にある <code>define('KE_LOGFILE', 'logs/error.log'); define('KE_DEBUG', TRUE);</code> のコメントを外して<a href="README.ja.html#logging">詳細のログ記録を有効</a>にしてみてください。これで問題発生個所が分かるかもしれません。</dd>
+原因が不明の場合、ktai_entry.php の 32,33 行目にある <code>define('KTAI_LOGFILE', 'logs/error.log'); define('KTAI_ENTRY_DEBUG', TRUE);</code> のコメントを外して<a href="README.ja.html#logging">詳細のログ記録を有効</a>にしてみてください。これで問題発生個所が分かるかもしれません。</dd>
 <dt id="images_not_saved">画像が保存されない</dt>
 <dd>アップロードディレクトリー (通常は wp-content/uploads) のオーナー (所有者) および パーミッション (アクセス権限) を確認してください。WordPress が自動作成した場合、オーナーがウェブサーバー (www-data など) で、パーミッションは 757 もしくは 777 になっています。755, 757 の場合、「メール着信したら投稿スクリプトを起動」方式ではスクリプトの実行ユーザーが HOME ディレクトリーのオーナーとなり、ディレクトリーのオーナーと異なるため、ファイルが保存できないことがあります。ディレクトリーの権限を 777 に変更してみてください。<br />
 PHP のセーフモードを利用している場合など、サーバーの設定によってはディレクトリーの自動生成ができない場合があります。この場合は、手動で wp-content/uploads/2008/10/ のように年月ごとのディレクトリーを作成し、パーミッションを 757 等にしておいてください。</dd>
@@ -96,7 +98,7 @@ Lightbox 用カスタマイズではないが、同様にフィルター関数�
 <dd>絵文字は <a href="http://wppluginsj.sourceforge.jp/ktai_style/">Ktai Style</a> の絵文字フォーマットである &lt;img localsrc="XXXX" /&gt; という書式で保存されます。このため、Ktai Style をインストールしていないと単なる img 要素となり、何も表示されません。Ktai Style をインストールすれば、携帯電話からは各キャリアの絵文字に、PC からはテキストに変換されて表示されます。<br />
 au, ウィルコムは投稿受け付けするメールサーバーを問わず絵文字が使えますが、ドコモ、ソフトバンク、イー・モバイルは Gmail, Yahoo! メール など、iモード絵文字がそのまま送信できるメールサーバー限定です。他の端末・サーバーでは絵文字が 〓 (ゲタ)、? (はてな) やテキスト文字列に変換されてしまうため、絵文字として認識されません。</dd>
 <dt id="accesslog">動作ログに記録が残らない</dt>
-<dd><code>define('KE_LOGFILE', 'logs/error.log');</code> のコメントを外して有効にした場合に動作ログが有効になりますが、パーミッションの設定によっては、ログが作られない場合があります。特に、外部メールボックス読み込み方式と、メール着信でスクリプトを起動する方式を併用している場合は、両者でプロセスオーナーが違うため、問題が起きやすいです (前者は Apache, 後者は HOME ディレクトリーのオーナー)。あらかじめ以下のようにしてログファイルを作成しておくのが無難です。
+<dd><code>define('KTAI_LOGFILE', 'logs/error.log');</code> のコメントを外して有効にした場合に動作ログが有効になりますが、パーミッションの設定によっては、ログが作られない場合があります。特に、外部メールボックス読み込み方式と、メール着信でスクリプトを起動する方式を併用している場合は、両者でプロセスオーナーが違うため、問題が起きやすいです (前者は Apache, 後者は HOME ディレクトリーのオーナー)。あらかじめ以下のようにしてログファイルを作成しておくのが無難です。
 <pre>mkdir logs
 chmod 0777 logs/;
 touch logs/error.log
@@ -122,28 +124,9 @@ chmod 1666 logs/error.log</pre></dd>
   <li>「したがき」→「DRAFT」</li>
   <li>「にちじ」→「DATE:1」</li>
 </ul></dd>
-<dt id="right-align">画像を右寄せにする</dt>
-<dd>インストール説明で紹介した CSS は画像が左寄せですが、右寄せにするには以下のようにしてください。(right と left を入れ替えただけです)
-<pre>.photo {
-	padding-left:6px;
-	float:right;
-	line-height:110%;
-	font-size:0.85em;
-	text-indent:0;
-}
-.photo img {
-	background:white;
-	margin:0 0 4px 4px;
-	padding:3px;
-	border:1px solid #999;
-}
-.photo-end {
-	clear:left;
-}
-</pre></dd>
 <dt id="lightbox">LightBox 用に、rel="lightbox" 属性を追加する</dt>
-<dd>独自フィルター image_link を使えば、Ktai Entry を改造しなくても可能です。my-hacks.php に以下のコードを書いてください。※バージョン 0.80 までに添付していたコードはバグっていたので以下のものに差し替えてください。
-<pre>function ke_rel_lightbox($html, $id, $size) {
+<dd>独自フィルター ktai_image_link を使えば、Ktai Entry を改造しなくても可能です。my-hacks.php に以下のコードを書いてください。※バージョン 0.80 までに添付していたコードはバグっていたので以下のものに差し替えてください。
+<pre>function ktai_rel_lightbox($html, $id, $size) {
 	if (preg_match('/rel=["\']/', $html, $match)) {
 		$html = str_replace($match[0], $match[0] . 'lightbox ', $html);
 	} elseif (! preg_match('/rel=/', $html)) {
@@ -151,33 +134,33 @@ chmod 1666 logs/error.log</pre></dd>
 	}
 	return $html;
 }
-add_filter('image_link/ktai_entry.php', 'ke_rel_lightbox', 10, 3);</pre></dd>
+add_filter('ktai_image_link', 'ktai_rel_lightbox', 10, 3);</pre></dd>
 <dt id="another_author">投稿許可アドレスを別途定義する</dt>
-<dd>ウェブログ登録ユーザーのメールアドレス以外から投稿を受け付けたいときは、validate_address フィルターを使うと可能です。my-hacks.php に以下のコードを書いてください。$authors 配列は、許可するメールアドレスと対応するユーザー ID を示すものです。適宜修正してください。メールアドレスは、WordPress の登録ユーザーのものであっても構いません。
-<pre>function ke_another_author($user_id, $address) {
+<dd>ウェブログ登録ユーザーのメールアドレス以外から投稿を受け付けたいときは、ktai_validate_address フィルターを使うと可能です。my-hacks.php に以下のコードを書いてください。$authors 配列は、許可するメールアドレスと対応するユーザー ID を示すものです。適宜修正してください。メールアドレスは、WordPress の登録ユーザーのものであっても構いません。
+<pre>function ktai_another_author($user_id, $address) {
 	$authors = array(
 		'foo@example.com' =&gt; 1,
 		'bar@example.net' =&gt; 4,
 	);
 	return isset($authors[$address]) ? $authors[$address] : $user_id;
 }
-add_filter('validate_address/ktai_entry.php', 'ke_another_author', 10, 2);</pre></dd>
+add_filter('ktai_validate_address', 'ktai_another_author', 10, 2);</pre></dd>
 <dt id="fix_author">投稿者は固定したい</dt>
-<dd>メールアドレスから決められた投稿者ではなく、誰か1人に投稿者を固定させたいときは、validate_address フィルターを使うと可能です。my-hacks.php に以下のコードを書いてください。携帯電話メールアドレスをユーザー登録したものの、投稿者は普段のものとしたい場合に使えます。以下の例はユーザー ID = 1 のユーザーに固定させる場合です。
-<pre>function ke_fix_author($user_id, $address) {
+<dd>メールアドレスから決められた投稿者ではなく、誰か1人に投稿者を固定させたいときは、ktai_validate_address フィルターを使うと可能です。my-hacks.php に以下のコードを書いてください。携帯電話メールアドレスをユーザー登録したものの、投稿者は普段のものとしたい場合に使えます。以下の例はユーザー ID = 1 のユーザーに固定させる場合です。
+<pre>function ktai_fix_author($user_id, $address) {
 	return $user_id ? 1 : 0
 }
-add_filter('validate_address/ktai_entry.php', 'ke_fix_author', 10, 2);</pre></dd>
+add_filter('ktai_validate_address', 'ktai_fix_author', 10, 2);</pre></dd>
 <dt id="restrict_author">登録ユーザーの一部は投稿不可としたい</dt>
-<dd>ウェブログ登録ユーザーであってもメール投稿を禁止したい場合、validate_address フィルターを使うと可能です。my-hacks.php に以下のコードを書いてください。$restricts 配列は、禁止するユーザー ID を示すものです。適宜修正してください。
-<pre>function ke_restrict_author($user_id, $address) {
+<dd>ウェブログ登録ユーザーであってもメール投稿を禁止したい場合、ktai_validate_address フィルターを使うと可能です。my-hacks.php に以下のコードを書いてください。$restricts 配列は、禁止するユーザー ID を示すものです。適宜修正してください。
+<pre>function ktai_restrict_author($user_id, $address) {
 	$restricts = array(2, 10);
 	return in_array($user_id, $restricts) ? 0 : $user_id;
 }
-add_filter('validate_address/ktai_entry.php', 'ke_restrict_author', 10, 2);</pre></dd>
+add_filter('ktai_validate_address', 'ktai_restrict_author', 10, 2);</pre></dd>
 <dt id="restrict_author">講読者はすべてメール投稿可能としたい</dt>
-<dd>PC の管理パネルでは、講読者 (subscriber) に投稿権限はありませんが、メール投稿は許可したい場合、post_status フィルターを使うと可能です。my-hacks.php に以下のコードを書いてください。
-<pre>function ke_allow_mailpost($status, $can_pending, $user_id, $address) {
+<dd>PC の管理パネルでは、講読者 (subscriber) に投稿権限はありませんが、メール投稿は許可したい場合、ktai_post_status フィルターを使うと可能です。my-hacks.php に以下のコードを書いてください。
+<pre>function ktai_allow_mailpost($status, $can_pending, $user_id, $address) {
 	if (! $user_id) {
 		return $status;
 	}
@@ -187,40 +170,22 @@ add_filter('validate_address/ktai_entry.php', 'ke_restrict_author', 10, 2);</pre
 	}
 	return $status;
 }
-add_filter('post_status/ktai_entry.php', 'ke_allow_mailpost', 10, 4);</pre></dd>
+add_filter('ktai_post_status', 'ktai_allow_mailpost', 10, 4);</pre></dd>
 <dt id="notify_publish">メール投稿されたら管理者にメールが届くようにしたい</dt>
-<dd>複数の投稿者がいるウェブログなど、メール投稿されたときに管理者にメールで届くようにしたい場合は、my-hacks.php に以下のコードを書いてください。管理者の ID が 1 でない場合は、<code>WP_User(1)</code> の部分を管理者の ID 番号に変更してください。以下のサンプルコードに対応する日本語リソースは Ktai Entry に組み込みずみですので、メッセージは日本語になります。
-<pre>function ke_notify_publish($post_id) {
-	if (! $post_id) {
-		return $post_id;
-	}
-	$admin = new WP_User(1);
-	$post = get_post($post_id);
-	$poster = new WP_User($post-&gt;post_author);
-	$blogname = get_option('blogname');
-	$message = __('New post on your blog.', 'ktai_entry') . "\r\n";
-	$message .= sprintf(__('Title: %s', 'ktai_entry'), $post-&gt;post_title) . "\r\n";
-	$message .= sprintf(__('Author: %s', 'ktai_entry'), $poster-&gt;display_name) . "\r\n\r\n";
-	$message .= __('You can see the post here:', 'ktai_entry') . "\r\n";
-	$message .= get_permalink($post-&gt;ID) . "\r\n";
-	$message .= sprintf(__('Edit it: %s', 'ktai_entry'), get_option('siteurl') . "/wp-admin/post.php?action=edit&post=$post-&gt;ID") . "\r\n";
-	$subject = sprintf(__('[%1$s] New Post: "%2$s"', 'ktai_entry'), $blogname, $post-&gt;post_title);
-	$wp_email = 'wordpress@' . preg_replace('#^www\.#', '', strtolower($_SERVER['SERVER_NAME']));
-	$headers = "From: \"$blogname\" &lt;$wp_email&gt;\n"
-	. "MIME-Version: 1.0\n"
-	. "Content-Type: text/plain; charset=ISO-2022-JP\n";
-	if (function_exists('mb_language') && function_exists('mb_internal_encoding') && function_exists('mb_send_mail')) {
-		mb_language('Japanese');
-		mb_internal_encoding(get_bloginfo('charset'));
-		mb_send_mail($admin-&gt;user_email, $subject, $message, $headers);
-	} else {
-		wp_mail($admin-&gt;user_email, $subject, $message, $headers);
-	}
-}
-add_action('publish_phone', 'ke_notify_publish');</pre></dd>
+<dd>Ktai Entry 0.9.0 からは、管理パネルで設定できるようになりました。</dd>
 <dt id="rotate_vga">VGA 以上のサイズなら画像を右回転させたい</dt>
-<dd>通常、携帯電話のカメラ画像は、モバイルモード (VGA未満) の場合縦向き (ポートレイト) で、デジタルカメラモード (VGA 以上のサイズ) なら横向き (ランドスケープ) となります。この場合、端末を縦方向のまま VGA 以上の画像サイズで撮影すると、左回転した状態になってしまいます (端末によっては右回転)。画像を縦向きにしたい場合は、右回転 (または左回転) させる必要があります。都度回転コマンドを入れるのが面倒な場合、以下のコードを my-hacks.php に書けば、画像サイズを認識して画像を自動回転させます。
-<pre>ke_rotate_vga($rotations, $rot_direction, $images) {
+<dd>通常、携帯電話のカメラ画像は、モバイルモード (VGA未満) の場合縦向き (ポートレイト) で、デジタルカメラモード (VGA 以上のサイズ) なら横向き (ランドスケープ) となります。この場合、端末を縦方向のまま VGA 以上の画像サイズで撮影すると、左回転した状態になってしまいます (端末によっては右回転)。画像を縦向きにしたい場合は、右回転 (または左回転) させる必要があります。都度回転コマンドを入れるのが面倒な場合、ktai_image_rotate フィルターを使うと自動回転が可能です。ktai_rotate_vga.php というファイル名で新規テキストファイルを作り、以下のコードを保存し、プラグインディレクトリー (wp-content/plugins/) にアップロードして「Ktai Entry Hook (Rotate VGA)」というプラグインを有効にすれば、画像サイズを認識して画像を自動回転させます。
+<pre>
+&lt;php 
+/*
+Plugin Name: Ktai Entry Hook (Rotate VGA)
+Plugin URI: http://wppluginsj.sourceforge.jp/ktai_entry/qa/
+Version: 0.9.0
+Description: Rotate large images than VGA automatically.
+Author: IKEDA Yuriko
+Author URI: http://www.yuriko.net/cat/wordpress/
+*/
+ktai_rotate_vga($rotations, $rot_direction, $images) {
 	if (count($rotations) && function_exists('imagecreatefromstring')) {
 		for ($i = 0 ; $i &lt; count($rotations) ; $i++) {
 			if (! isset($rotations[$i]) || $rotations[$i] != 'N') {
@@ -240,7 +205,8 @@ add_action('publish_phone', 'ke_notify_publish');</pre></dd>
 	}
 	return $rotations;
 }
-add_filter('image_rotate/ktai_entry.php', 'ke_rotate_vga', 10, 3);</pre>
+add_filter('ktai_image_rotate', 'ktai_rotate_vga', 10, 3);
+?&gt;</pre>
 なお、端末によっては、撮影時のカメラ位置を判断して適切な向きに直すので、上記のコードは不要です。</dd>
 </dl>
 

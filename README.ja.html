@@ -16,6 +16,8 @@ dd {margin-bottom:0.5em;}
 dl.itemize dt {font-weight:bold; background: #ffcccc;; margin-right:25%;}
 li {line-height:1.5em;}
 .navi {text-align:center;}
+strong, del {background-color:#ccc;}
+pre {color:#230;padding:3px;border:solid gray 1px;line-height:100%;}
 table {border-top:1px solid black;border-left:1px solid black;border-collapse:collapse}
 table th {border:0 none;border-right: solid 1px black;border-bottom: solid 1px black;}
 table td {border:0 none;border-right: solid 1px black;border-bottom: solid 1px black;}
@@ -24,7 +26,7 @@ table.compare td.feature {text-align:left;}</style>
 </head>
 <body>
 <h1>Ktai Entry マニュアル</h1>
-<p class="navi">[ <a href="README.ja.html">はじめに</a> | <a href="Q_and_A.ja.html">よくある質問と答え</a> | <a href="ERRORS.ja.html">エラーメッセージ</a> ]</p>
+<p class="navi">[ <a href="README.ja.html">はじめに</a> | <a href="DOCUMENTS/Q_and_A.ja.html">よくある質問と答え</a> | <a href="DOCUMENTS/ERRORS.ja.html">エラーメッセージ</a> ]</p>
 
 <h2>はじめに</h2>
 <p>プラグイン配布サイト: <a href="http://wppluginsj.sourceforge.jp/ktai_entry/">http://wppluginsj.sourceforge.jp/ktai_entry/</a></p>
@@ -39,7 +41,8 @@ table.compare td.feature {text-align:left;}</style>
   <li>投稿日時を指定できます。日時を直接指定する方法と、添付する画像の撮影日時を投稿日時にする指定方法の2種類があります。</li>
   <li>画像を添付したメールに対応しています。画像を回転したり、大きい画像をサムネール化することが可能です。</li>
   <li>画像は WordPress のファイルアップロード／メディアライブラリに格納されます。</li>
-  <li>絵文字投稿に対応しています。au, ウィルコム、ドコモ、ソフトバンク、イー・モバイルの絵文字を認識し、<a href="http://wppluginsj.sourceforge.jp/ktai_style/">Ktai Style</a> の絵文字フォーマット (&lt;img localsrc="NNN" /&gt;) で保存されます。Ktai Style を併用すれば絵文字が表示されます。なお、PC の場合は、iモード絵文字とそれに類似した絵文字のみ画像表示され、それ以外は代替文字での表示になります。</li>
+  <li>絵文字投稿に対応しています。au, ウィルコム、ドコモ、ソフトバンク、イー・モバイルの絵文字認識し、<a href="http://wppluginsj.sourceforge.jp/ktai_style/">Ktai Style</a> の絵文字フォーマット (&lt;img localsrc="NNN" /&gt;) で保存されます。Ktai Style を併用すれば絵文字が表示されます。なお、PC の場合は、iモード絵文字とそれに類似した絵文字のみ画像表示され、それ以外は代替文字での表示になります。</li> 
+  <li>デコメ絵文字も認識します。デコメ絵文字は画像として投稿のメディアライブラリに格納されます。携帯で閲覧するときも画像として扱われます。</li>
 </ul>
 
 <p>環境に応じて、以下のいずれかの投稿スタイルが選べます。</p>
@@ -52,11 +55,10 @@ table.compare td.feature {text-align:left;}</style>
 
 <h3 id="requirements">対応環境</h3>
 <ul>
-  <li>WordPress 2.0 以降。2.7 にも対応しています。</li>
-  <li>キーワードタグの付与は WordPress 2.3 以降のみ対応です。</li>
-  <li>PHP 5.0 以降。<strong>***** PHP4 では動きません!! *****</strong><br />
-  ただし、動作確認は PHP5.2.x で行なっていますので、それ以前のバージョンによって動かないかもしれません。PHP 5.0.x, 5.1.x をご利用の場合は、自己責任にてご利用をお願いします。</li>
-  <li>絵文字投稿は、au、ウィルコム、ドコモ、ソフトバンク、イー・モバイルに対応しています。au、ウィルコムは、どのメールサーバー宛でも絵文字が使えますが、ドコモ・ソフトバンクは Gmail, au one メール、Yahoo! メール宛のみ、イー・モバイルは音声端末から Gmail, au one メール宛のみ絵文字が利用可能です。なお、それ以外のメールサーバーを使っている場合は、Gmail から投稿受付アドレスに転送をかければ、携帯電話 から Gmail に送信することで、絵文字メールを送信できます。</li>
+  <li>WordPress 2.6 以降。2.9 にも対応しています。WordPress 2.0〜2.5.1 については、Ktai Entry 0.8.11 をご利用ください。</li>
+  <li>PHP 5.1 以降。<strong>***** PHP4 では動きません!! *****</strong><br />
+  ただし、動作確認は PHP5.2.x で行なっていますので、それ以前のバージョンによって動かないかもしれません。PHP 5.1.x をご利用の場合は、自己責任にてご利用をお願いします。</li>
+  <li>絵文字投稿は、au、ウィルコム、ドコモ、ソフトバンク、イー・モバイルそれぞれの通常音声端末に対応しています (スマートフォンは除く)。au、ウィルコムは、どのメールサーバー宛でも絵文字が使えますが、ドコモ・ソフトバンクは Gmail, au one メール、Yahoo! メール宛のみ、イー・モバイルは音声端末から Gmail, au one メール宛のみ絵文字が利用可能です。なお、それ以外のメールサーバーを使っている場合は、Gmail から投稿受付アドレスに転送をかければ、携帯電話 から Gmail に送信することで、絵文字メールを送信できます。</li>
   <li>(メール着信時に投稿スクリプトを起動する方式を使う場合の条件)<ul>
   <li>qmail または Postfix を利用したメールサーバー。ただし Postfix では動作確認を行なってないので動かないかもしれません。</li>
   <li>.qmail/.forward/.procmailrc などを自分で好きに作成して編集できる必要があります。</li>
@@ -67,10 +69,9 @@ table.compare td.feature {text-align:left;}</style>
 <h3 id="installation">設置方法</h3>
 <p>プラグインをインストールするだけでは、うまく動作しません。以下の設置方法を良く読んで作業してください。</p>
 <ol>
-  <li>wp-shot を使っていた場合は、プラグインを停止してください。wp-mta を使っていた場合は、当該ファイルを削除してください。</li>
-  <li>プラグインをダウンロードして展開し、ktai_entry フォルダーごとサーバーのプラグインディレクトリー (wp-content/plugins/) に転送します。<br />
-  ※ただし、README.ja.html 等の html ファイル、lang フォルダー内の po ファイルは転送しなくて構いません (mo ファイルは必要です)。</li>
-  <li>投稿スタイルに応じてメールサーバーの設定をします。<dl>
+  <li>他のメール投稿プラグインを使っている場合、それらを停止して、プラグインファイルを削除してください。wp-shot を使っていた場合、wp-shot/style.css の内容も、お使いのテーマの style.css に追記しておいてください (でないと、過去のメール投稿写真のスタイルが崩れます)。</li>
+  <li>プラグインをダウンロードして展開し、ktai-entry フォルダーごとサーバーのプラグインディレクトリー (wp-content/plugins/) に転送します。</li>
+  <li>投稿スタイルに応じて、以下の通りメールサーバーの設定をします。<dl>
   <dt>(外部メールボックスに随時アクセスの場合)</dt>
   <dd>投稿専用メールアドレスを設定します。<ol>
       <li>携帯用メールアドレスを準備・取得してください。できれば、他で使っているアドレスと兼用にするのは避けて、専用のメールアドレスにしてください。無料メールアドレスで構いません。</li>
@@ -85,43 +86,59 @@ table.compare td.feature {text-align:left;}</style>
       <li>メールサーバーにシェルログインし、.qmail-SECRET (qmail の場合)、もしくは .forward+SECRET (postfix の場合) というファイルを作ります (SECRET はさっき作った秘密の文字列)。これは qmail や postfix でサポートされている拡張メールアドレスの機能で、USER-secret@example.com または USER+secret@example.com というメールアドレスが有効になります。qmail の場合、秘密の文字列は英小文字と数字だけにしてください (大文字やドットは無効)。</li>
       <li>ファイルの中身は以下のようにします。(PHP および wp-content/ へのパスはサーバーに応じて調整してください)
       <pre> | /usr/bin/php /(WordPress へのパス)/wp-content/plugins/ktai_entry/inject.php</pre></li>
+      <li>WordPress MU の場合、ブログごとに .qmail-SECRET ないし .forwarc+SECRET を作ってください。そして、inject.php に <code>-blog</code> オプションで <code>blog_id</code> を指定してやる必要があります。
+      <pre> | /usr/bin/php /(WordPress へのパス)/wp-content/plugins/ktai_entry/inject.php -blog 2</pre>
+      また、wp-config.php にて <code>define( 'SUNRISE', 'on' );</code> のコメントを外し、ktai_entry/sunrise.php を wp-content/sunrise.php にコピーする必要があります。もし、すでに sunrise.php が存在する場合は、ktai_entry/sunrise.php の内容を既存の sunrise.php の後に追加してください。</li>
   </ol></dd>
   <dd>※要は、秘密のメールアドレスにメールが着信したら inject.php が起動されるようにします。自宅サーバーをお使いの方ならば、他の設定方法にもチャレンジしてみてください。</dd>
 </dl></li>
-  <li>自分の WordPress サイトに管理者ログインして、新規にユーザーを作り、メールアドレスとして、携帯電話のメールアドレスを入力します。登録ユーザーのメールアドレスのみ投稿できるようチェックしているためです。メール送信してすぐ公開したい場合は、権限を「作成者／作者 (author)」以上としてください。「投稿者／寄稿者 (contributor)」の場合、「レビュー待ち (pending)」または「下書き (draft)」になり、編集者 (editor) 以上の権限を持つユーザーによる公開処理が必要となります。「購読者／協力者 (subscriber)」の場合は投稿できません。</li>
-  <li>使用しているテーマファイルのスタイルシート (style.css) を編集して、以下のスタイルを追加します。こうすると、写真の右側に文章が回り込むようになり、写真の周囲に白い余白とグレーの枠がついてかっこよくなります。スタイルの内容は好みに応じて適宜変更して構いません。
-<pre>/* ----- Style for Ktai Entry ----- */
-.photo {
-	padding-right:6px;
-	float:left;
-	line-height:110%;
-	font-size:0.85em;
-	text-indent:0;
+  <li>自分の WordPress サイトに管理者ログインして、新規にユーザーを作り、メールアドレスとして、携帯電話のメールアドレスを入力します。登録ユーザーのメールアドレスのみ投稿できるようチェックしているためです。メール送信してすぐ公開したい場合は、権限を「作成者 (author)」以上としてください。「投稿者 (contributor)」の場合、「レビュー待ち (pending)」または「下書き (draft)」になり、編集者 (editor) 以上の権限を持つユーザーによる公開処理が必要となります。「購読者 (subscriber)」の場合は投稿できません。</li>
+  <li>使用しているテーマのスタイルシート (style.css) を確認し、alignleft, aligncenter, alignright, clear クラスに対応していなければ、以下の記述を追加してください。
+<pre>img.alignright {
+	padding: 4px;
+	margin: 0 0 2px 7px;
+	display: inline;
 }
+img.alignleft {
+	padding: 4px;
+	margin: 0 7px 2px 0;
+	display: inline;
+}
+.aligncenter, div.aligncenter {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+.alignright {
+	float: right;
+}
+.alignleft {
+	float: left
+}
+.clear {
+	clear:both;
+}</pre>
+  また、画像にプリント写真のような白枠を付けたいならば、以下のスタイルを style.css に追加してください。
+<pre>/* ----- Style for Ktai Entry ----- */
 .photo img {
 	background:white;
-	margin:0 4px 4px 0;
+	margin:0 4px 2px 4px;
 	padding:3px;
 	border:1px solid #999;
 }
-.photo-end {
-	clear:left;
-}
-/* ---------- */</pre>
-  wp-shot を使っていた場合、wp-shot/style.css の内容も、お使いの style.css に追記しておいてください (でないと、過去のメール投稿写真のスタイルが崩れます)。</li>
+/* ---------- */</pre></li>
   <li>Ktai Entry プラグインを有効にします。</li>
-  <li>サイト管理画面の各種設定→メール投稿でオプションを変更します。基本的にはそのままで問題ありません。<ul>
-    <li>投稿受付メールアドレス: 3. で設定した投稿受付メールアドレスを記載します。宛先 (To, Cc) にこのアドレスが含まれていない場合、投稿は受け付けられません。このフィールドが空の場合はアドレスチェックを行ないません。</li>
+  <li>管理パネル「各種設定」→「メールで投稿」のオプションを変更します。基本的にはそのままで問題ありません。<ul>
     <li>サーバーオプション: メールサーバーが APOP 対応のときは「APOP使用」チェックボックスに印をします。POP over SSL を使うとき (Gmail, Yahoo! メール等) はチェックを外してください。</li>
-    <li>POP3 読み込み間隔: 外部メールボックスを確認する間隔を設定します。サーバー負荷がかかるため、最短でも5分程度としてください。「しない」にすると、自動的に確認しないため、retrieve.php を手動でアクセスしない限り投稿処理は行なわれません。メール着信すると投稿スクリプトを起動させる方式の場合は「しない」にしてください。<br />
-  ※ WordPress 2.1.x 以前でインストール直後に「メール投稿」設定パネルを開いた場合、読み込み間隔に「しない」を選んで設定を保存しても、デフォルトの「15分」に戻ってしまいます (WordPress のバグ)。一度、「15分」のまま設定を保存してから「しない」を選べば設定可能です。</li>
-    <li>投稿に挿入する画像サイズ (WordPress 2.5 以降): 投稿に挿入する画像サイズを「サムネイル」または「中サイズ」から選べます。なお、画像のサイズは「その他設定」で変更してください。</li>
-    <li>サムネイルの最大サイズ (WordPress 2.3.3 以前): 画像の縦横どちらかがこのサイズより大きい場合は、長辺側がこのサイズになるよう縮小されます。</li>
+    <li>POP3 読み込み間隔: 外部メールボックスを確認する間隔を設定します。サーバー負荷がかかるため、最短でも5分程度としてください。「しない」にすると、自動的に確認しないため、retrieve.php を手動でアクセスしない限り投稿処理は行なわれません。メール着信すると投稿スクリプトを起動させる方式の場合は「しない」にしてください。</li>
+    <li>投稿受付メールアドレス(オプション): 3. で設定した投稿受付メールアドレスを記載します。宛先 (To, Cc) にこのアドレスが含まれていない場合、投稿は受け付けられません。このフィールドが空の場合はアドレスチェックを行ないません。</li>
+    <li>投稿に挿入する画像の配置: 投稿に画像があるとき、画像の回り込み配置を指定します。「なし」は回り込みをしません (==画像の下に本文が来ます)。「左」と「右」は本文に対して左／右に画像を配置します。「中央」は画像をページの中央に配置します。なお、使用しているテーマが WordPress 標準の alignleft, alignright, aligncenter の各 CSS クラスに対応している必要があります。未対応の場合は、回り込みの指定が効きません。</li>
+    <li>投稿に挿入する画像サイズ: 投稿に挿入する画像サイズを「サムネイル」「中サイズ」「大サイズ」「フルサイズ」から選べます。もし、「中サイズ」「大サイズ」を設定したものの、投稿した写真が小さくて当該サイズに満たない場合は「サムネイル」の大きさが使われます。なお、サムネイル、中サイズのピクセル数は管理パネル「設定」→「メディア」(または「その他の設定」) で変更してください。</li>
     <li>投稿テンプレート (添付画像があるとき): 添付画像があるときの投稿テンプレートです。写真を本文の下に置きたい場合などは編集してください。投稿がテキストだけのとき、テンプレートは使用されません。</li>
   </ul>※wp-shot で必要だった cron ジョブの設定、RFC1939 のチェックはなくなりました。</li>
 ます。</li>
 </ol>
-<p>以上で完了です。WordPress 2.3 以降を使っている場合、本プラグインの更新を知らせるために、別途「<a href="http://wppluginsj.sourceforge.jp/jseries-notifier/">JSeries Notifier</a>」をインストールされることをおすすめします。</p>
+<p>以上で完了です。本プラグインの更新を知らせるために、別途「<a href="http://wppluginsj.sourceforge.jp/jseries-notifier/">JSeries Notifier</a>」をインストールされることをおすすめします。</p>
 
 <h4 id="move_wpcontent">wp-content もしくは wp-content/plugins ディレクトリーを標準の位置以外に移設する場合</h4>
 <p>WordPress 2.6 以降で可能になった、wp-content ディレクトリーや wp-content/plugins ディレクトリーを標準の位置以外に移設する場合は、以下の手順で行なってください。</p>
@@ -140,7 +157,7 @@ table.compare td.feature {text-align:left;}</style>
 <ol>
   <li>まず、<a href="http://mail.google.com/mail/signup">Gmail アカウントを作成</a>します。すでに持っている場合も、できれば別に作った方がよいです。</li>
   <li>Gmail 設定→メール転送と POP/IMAP 設定→POP ダウンロード、で「今後受信するメールで POP を有効にする」を選択します。</li>
-  <li>何かランダムな文字列を作ります。「メールでの投稿」で表示されるランダムな文字列から記号を抜いて大文字を小文字に変える (例: aBM9dDu*^w$R → abm9dduwr) とか、シェルで <code>php -r 'echo md5(uniqid(rand(), true)) . "\n";'</code> などとします。この文字列を Gmail アドレスのローカルパート (@ の前の部分) に + で連結して、投稿受付アドレスを作ります。<br />
+  <li>何かランダムな文字列を作ります。「投稿設定」→「メールでの投稿」で表示されるランダムな文字列から記号を抜いて大文字を小文字に変える (例: aBM9dDu*^w$R → abm9dduwr) とか、シェルで <code>php -r 'echo md5(uniqid(rand(), true)) . "\n";'</code> などとします。この文字列を Gmail アドレスのローカルパート (@ の前の部分) に + で連結して、投稿受付アドレスを作ります。<br />
   Gmail アドレスが example@gmail.com で、ランダムな文字列が abm9dduwr とすると「example+abm9dduwr@gmail.com」が投稿受付アドレスとなります。Gmail から携帯電話にこのメールアドレスを本文に書いて送信しておくと便利です。</li>
   <li>Ktai Entry オプションの「投稿受付アドレス」に、このアドレスを記入します。これで、ランダム文字列を付けたアドレスのみが受付され、通常の Gmail アドレス (exmaple@gmail.com など) 宛のメールは拒否されます。</li>
   <li>投稿設定→メールでの投稿、を以下のように設定します。Gmail は SSL 必須です。
@@ -170,6 +187,39 @@ table.compare td.feature {text-align:left;}</style>
 <h3 id="upgrade">以前のバージョンからの更新方法</h3>
 <ol>
   <li>まず、プラグインを無効にしてください。</li>
+  <li>バージョン 0.8.11 以前を使っている場合、以下の作業が必要です。<ul>
+    <li>Ktai Entry 本体のディレクトリー名が ktai_entry から ktai-entry に変更されています。プラグインをディレクトリーごと削除するか、FTP/SFTP ツールもしくはシェルでディレクトリー名を変更してください。</li>
+    <li>inject.php, retrieve.php, post.php が inc サブディレクトリーに移動しました。このため、これらのファイルを参照している .qmail スクリプト／cron 設定／.htaccess 設定などで、ファイルへのパスを修正してください (ktai_entry/inject.php → ktai-entry/inc/inject.php 等)</li>
+  </ul></li>
+  <li>バージョン 0.8.10 以前を使っている場合、以下の作業が必要です。<ul>
+    <li>一旦、「メールで投稿」設定パネルを開いてオプション値を更新してください。外部メールボックスを随時取り込む方式の場合、こうしないとメールの定期的な取り込みが行われません。<ul>
+      <li>POP3 読み込み間隔を「しない」に設定していた場合は「15分」に戻っていますので、手動で「しない」に設定し直してください。</li>
+      <li>「投稿に挿入する画像の配置」はデフォルトが「なし」になっていますので、従来通り「左側で回り込み」させる場合は「左」を指定してください。</li>
+      <li>投稿テンプレートの中身をいったん空白にしてください (これにより新しいデフォルトテンプレートに変わります)。テンプレートをカスタマイズしていた場合は、「変更を保存」ボタンを押してから、新しいテンプレートに対してカスタイズを行なってください。</li>
+    </ul></li>
+    <li>(my-hacks.php などで) 独自フィルターフックを使ったカスタマイズをしている場合、フィルターフック名を xxxxx/ktai_entry.php → ktai_xxxxx に変更してください。</li>
+    <li>投稿に挿入する画像の配置を指定できるよう、style.css にある <code>.photo</code> 指定を削除し、<code>.photo img</code>の指定を以下のように修正してください。
+<pre><del>.photo {
+	padding-right:6px;
+	float:left;
+	line-height:110%;
+	font-size:0.85em;
+	text-indent:0;
+}</del>
+.photo img {
+	background:white;
+	<del>margin:0 4px 4px 0;</del>→margin:0 4px 2px 4px;
+	padding:3px;
+	border:1px solid #999;
+}
+.photo-end {
+	clear:left;
+}</pre>
+        これにより、古い投稿では画像の回り込みがされなくなります。気になる場合は、以下のいずれかの対応を取ってください。<ul>
+      <li>古い投稿の <code>class="photo"</code> をすべて <code>class="photo alignleft"</code> に変更する。</li>
+      <li>上記 photo クラスの指定を残しておく。(この場合「投稿に挿入する画像の位置」の設定は反映されなくなります)</li>
+    </ul></li>
+  </ul></li>
   <li>バージョン 0.7.1 以前を使っていた場合、ktai_entry ディレクトリー直下にある po ファイル、mo ファイルは削除してください。</li>
   <li>ktai_entry ディレクトリー直下のファイルを、新しいファイルで上書きしてください。</li>
   <li>プラグインを有効にし、「投稿設定」でメールサーバーのパスワードが正しいか確認してください。(プラグインを無効にしたときパスワードを初期化し、有効にしたとき復帰させていますが、その復帰処理が正常に行なわれているかの確認をお願いします)</li>
@@ -180,7 +230,7 @@ table.compare td.feature {text-align:left;}</style>
 <ol>
   <li>管理画面の「携帯表示」で、一番下にある「オプション値をデフォルトに戻す」をクリックします。</li>
   <li>プラグインを無効にします。</li>
-  <li>FTP ツール等で、wp-content/plugins から ktai_entry ディレクトリーを丸ごと削除します。</li>
+  <li>FTP ツール等で、wp-content/plugins から ktai-entry ディレクトリーを丸ごと削除します。</li>
   <li>念のため、「投稿設定」→「メールでの投稿」で、メールサーバーの設定がデフォルト値 (mail.example.com 等) に戻っていることを確認してください。戻っていなければ、すべて空白にしておいてください。</li>
 </ol>
 
@@ -189,7 +239,7 @@ table.compare td.feature {text-align:left;}</style>
 <dl>
 <dt>タイトル</dt><dd>メールの題名 (Subject)、または本文中の &lt;title&gt;〜&lt;/title&gt; で囲まれた内容。(後者が優先です)</dd>
 <dt>投稿作成者</dt><dd>差出人 (From) アドレスに対応する登録ユーザー</dd>
-<dt>公開ステータス</dt><dd>投稿作成者が「作成者／作者 (author)」以上の権限を持つ場合は「公開」です。「投稿者／寄稿者 (contributor)」の場合は、「レビュー待ち (pending)」(WordPress 2.3 以降) または 「下書き (draft)」(WordPress 2.2.3 以前) となります。「講読者／協力者 (subscriber)」の場合は、投稿できずエラーとなります。DRAFT, PENDING コマンド (後述) で変更できます。</dd>
+<dt>公開ステータス</dt><dd>投稿作成者が「作成者 (author)」以上の権限を持つ場合は「公開」です。「投稿者 (contributor)」の場合は、「レビュー待ち (pending)」となります。「講読者 (subscriber)」の場合は、投稿できずエラーとなります。DRAFT, PENDING コマンド (後述) で変更できます。</dd>
 <dt>投稿日時</dt><dd>メール投稿日時 (Date フィールドの日時)。DATE コマンド (後述) で変更できます。<br />重複投稿を防ぐため、Date フィールドの日時ないし、DATE コマンドで指定した日時が、すでに存在する投稿の日時と一致する場合はメールが読み込まれません。</dd>
 <dt>投稿スラッグ</dt><dd>時分秒を繋げた6ケタの数字 (同じ数字が存在するときは -2, -3,... と追番がつきます)。SLUG: コマンド (後述) で変更できます。</dd>
 <dt>カテゴリー</dt><dd>デフォルトは、管理パネル→各種設定→投稿設定の「メール投稿時のデフォルトカテゴリー」。CAT: コマンド (後述) で変更できます。</dd>
@@ -199,7 +249,7 @@ table.compare td.feature {text-align:left;}</style>
 </dl>
 
 <h4 id="status">公開ステータス設定</h4>
-<p>作成者 (author) 以上の権限を持つユーザーが投稿する場合、通常はすぐ公開されますが、以下のコマンドを入れると下書き (draft) またはレビュー待ち (pending; WordPress 2.3 以降のみ使用可能) の状態を設定できます。投稿者 (contributor) 以下のユーザーは、これらのコマンドを使っても無効です。コマンド文字列は投稿本文からは削除され、見えなくなります (寄稿者以下のユーザーが使っても削除されます)。</p>
+<p>作成者 (author) 以上の権限を持つユーザーが投稿する場合、通常はすぐ公開されますが、以下のコマンドを入れると下書き (draft) またはレビュー待ち (pending) の状態を設定できます。投稿者 (contributor) 以下のユーザーは、これらのコマンドを使っても無効です。コマンド文字列は投稿本文からは削除され、見えなくなります (寄稿者以下のユーザーが使っても削除されます)。</p>
 <p>写真だけアップロードする／とりあえず投稿しておいて、あとで Ktai Style でじっくり編集する、などに使えます。</p>
 <dl>
 <dt>下書きにする</dt>
@@ -209,7 +259,7 @@ table.compare td.feature {text-align:left;}</style>
 <dt>レビュー待ちにする</dt>
 <dd>メール本文のどこかに
 <pre>PENDING</pre>
-と書きます。1行の中に「PENDING」以外の文字列を書いてはいけません。PENDING は行頭にある必要があります。WordPress 2.2 以前では「レビュー待ち」機能がないため、下書きの指定になります。</dd>
+と書きます。1行の中に「PENDING」以外の文字列を書いてはいけません。PENDING は行頭にある必要があります。</dd>
 <dt>未公開にする</dt>
 <dd>メール本文のどこかに
 <pre>PRIVATE</pre>
@@ -242,7 +292,7 @@ DATE: 1</pre>
   または
 CAT:カテゴリー名
   または
-CAT:カテゴリースラッグ (WordPress 2.3 以降のみ対応)</pre>
+CAT:カテゴリースラッグ</pre>
 <ul>
   <li>「CAT:」の文字列は行頭に書くことが必要です。</li>
   <li>コマンド文字列は投稿本文からは削除され、見えなくなります。</li>
@@ -262,7 +312,7 @@ CAT: plans, 首都圏日帰り, 46</pre>
   または
 CAT+カテゴリー名
   または
-CAT+カテゴリースラッグ (WordPress 2.3 以降のみ対応)</pre>
+CAT+カテゴリースラッグ</pre>
 と書きます。「CAT+」の文字列は行頭に書くことが必要です。コンマで区切って複数のカテゴリーを追加することも可能です。</p>
 
 <h5 id="change-cats">カテゴリー変更の方法</h5>
@@ -271,17 +321,17 @@ CAT+カテゴリースラッグ (WordPress 2.3 以降のみ対応)</pre>
   または
 CAT&gt;カテゴリー名
   または
-CAT&gt;カテゴリースラッグ (WordPress 2.3 以降のみ対応)</pre>
+CAT&gt;カテゴリースラッグ</pre>
 と書きます。「CAT&gt;」の文字列は行頭に書くことが必要です。コンマで区切って複数のカテゴリーを記述できますが、変更対象となるのは最後の行にある最初のカテゴリーです。投稿には記載したすべてのカテゴリーが反映されます。</p>
 <pre>CAT+&gt;カテゴリーID
   または
 CAT+&gt;カテゴリー名
   または
-CAT+&gt;カテゴリースラッグ (WordPress 2.3 以降のみ対応)</pre>
+CAT+&gt;カテゴリースラッグ</pre>
 と書いた場合は、デフォルトカテゴリーの変更を行いますが、既存の「メール投稿時のデフォルトカテゴリー」も投稿に反映されます。つまり、既存のデフォルトカテゴリーと今回指定したカテゴリーの両方が指定されます。</p>
 
 <h4 id="tags">キーワードタグ付与</h4>
-<p>WordPress 2.3 以降では、キーワードタグも付与できます。メール本文のどこかに、以下のように書きます。</p>
+<p>キーワードタグも付与できます。メール本文のどこかに、以下のように書きます。</p>
 <pre>TAG:タグスラッグ名</pre>
 <ul>
   <li>「TAG:」の文字列は行頭に書くことが必要です。</li>
@@ -316,16 +366,16 @@ ROT:R</pre>
 
 <h3 id="restrictions">制限事項</h3>
 <ul>
-  <li>シンボリックリンクで ktai_entry ディレクトリー、wp-content ディレクトリー等を移動している場合、正常に動作しないことがあります。</li>
+  <li>シンボリックリンクで ktai-entry ディレクトリー、wp-content ディレクトリー等を移動している場合、正常に動作しないことがあります。</li>
   <li>投稿受付メールアドレスは他人に知られないようにしてください。知られた場合、悪意ある他人にメール投稿されてしまいます。一応、From アドレスが WordPress に登録されたユーザーのものかどうかチェックを行なっていますが、悪意を持った人であれば簡単に From アドレスを詐称できるため、万全ではありません。</li>
-  <li>投稿を受け付けるメールアドレスは、原則としてウェブログの登録ユーザーのメールアドレスのみです。携帯電話から投稿する場合は、別途ユーザーを作って、携帯電話メールアドレスを登録してください。ただし、validate_address フック (後述) を利用して、<a href="Q_and_A.ja.html#another_author">許可メールアドレスを別途定義する</a>ことも可能です。</li>
-  <li>モブログで作成した投稿にコメントがついた場合、携帯電話に通知メールが送られます (投稿者のメールアドレスが携帯電話アドレスのため)。携帯電話でアドレス指定受信／ドメイン指定受信などをしている場合は、ウェブログのドメインを受信許可させるようにしてください。携帯電話に通知が行くのが嫌な場合は、上記の通り、validate_address フックを使って、携帯電話アドレスは別途定義として、投稿者は普段のユーザーになるように設定してください。</li>
+  <li>投稿を受け付けるメールアドレスは、原則としてウェブログの登録ユーザーのメールアドレスのみです。携帯電話から投稿する場合は、別途ユーザーを作って、携帯電話メールアドレスを登録してください。ただし、ke_validate_address フック (後述) を利用して、<a href="DOCUMENTS/Q_and_A.ja.html#another_author">許可メールアドレスを別途定義する</a>ことも可能です。</li>
+  <li>モブログで作成した投稿にコメントがついた場合、携帯電話に通知メールが送られます (投稿者のメールアドレスが携帯電話アドレスのため)。携帯電話でアドレス指定受信／ドメイン指定受信などをしている場合は、ウェブログのドメインを受信許可させるようにしてください。携帯電話に通知が行くのが嫌な場合は、上記の通り、ke_validate_address フックを使って、携帯電話アドレスは別途定義として、投稿者は普段のユーザーになるように設定してください。</li>
   <li>各種コマンドはそれぞれ併用することが可能ですが、同じコマンドは複数使えません。2つ目以降は無視されます (コマンド文字列も残ります)。</li>
   <li>携帯電話の機種によっては、カメラ画像に EXIF を記録しない場合があります (シャープ製ソフトバンク端末など)。この場合、DATE コマンドで「添付画像を指定」しても投稿日時指定が効かず、Date: フィールドの日付になります。</li>
   <li>画像回転させたとき、EXIF 情報は消えてしまいます。DATE コマンドで画像ファイルの日付を投稿日時に指定させる場合は、回転させた画像を指定しないでください (指定が効きません)。<br />
   また、GPS 情報を埋め込ませて <a href="http://wppluginsj.sourceforge.jp/ktai_location/">Ktai Location</a> プラグイン等で読ませる場合も、回転させた画像では情報が読めません。画像回転させつつ位置情報を保持させたい場合、写真の添付時には本文にも位置情報 URL を添付させるようにしてください。</li>
   <li>絵文字を表示させるには、<a href="http://wppluginsj.sourceforge.jp/ktai_style/">Ktai Style</a> プラグインを併用する必要があります。Ktai Style をインストールしていないと、絵文字部分は単なる img 要素となり、何も表示されません。</li>
-  <li>絵文字が使えるのは、au、ウィルコム、ドコモ、ソフトバンク 3G、イー・モバイル音声端末です。ただし、イー・モバイルの場合、イー・モバイル独自絵文字 (No.253 人差し指以降) は、絵文字が [人差し指] というテキスに変換されており、絵文字になりません。</li>
+  <li>絵文字が使えるのは、au、ウィルコム、ドコモ、ソフトバンク 3G、イー・モバイル音声端末です (スマートフォン除く)。ただし、イー・モバイルの場合、イー・モバイル独自絵文字 (No.253 人差し指以降) は、イー・モバイルのゲートウェイで絵文字が [人差し指] などのテキストに変換されてしまい、絵文字になりません。</li>
   <li>iモード絵文字は Gmail, au one メール、Yahoo! メール宛のみ利用可能です。それ以外のメールサーバーおよび、mova 端末から iショットメールを送信した場合は、ドコモのサーバーで絵文字が 〓 (ゲタ) に変換されるため、Ktai Entry で利用できません。</li>
   <li>ソフトバンク絵文字は 3G 端末から Gmail, au one メール、Yahoo! メール宛のみ利用可能です。それ以外のメールサーバーから送信した場合は、ソフトバンクのサーバーで絵文字が〓に変換されるため、Ktai Entry で利用できません。PDC 端末はEメールで絵文字の入力ができないので使用できません。</li>
   <li>イー・モバイル絵文字は音声端末から Gmail, au one メール宛のみ利用可能です。それ以外のメールサーバーから送信した場合は、ソフトバンクのサーバーで絵文字が〓やテキストに変換されるため、Ktai Entry で利用できません。スマートフォンはEメールで絵文字の入力ができないので使用できません。</li>
@@ -335,7 +385,7 @@ ROT:R</pre>
   <li>本文がすでに存在する投稿と同じときは重複とみなしてエラーとしますが、次の場合は重複判定をすり抜けてしまいます。(1) 添付画像がある場合。同じ画像があっても追番が付与されてファイル名が異なってしまうため、同一判定に引っかかりません。(2) <a href="http://wppluginsj.sourceforge.jp/ktai_location/">Ktai Location</a> で認識される地図 URL を含む場合。すでに存在する投稿は Ktai Location で地図 URL を無効にする書換えがされていますが、新規投稿は書換えが行われる前であり同じ内容と認識されないため、同一と判定されません。</li>
   <li>(外部メールボックスに随時アクセスする方式に関する注意)<ul>
     <li>実際に、外部メールボックスを確認するタイミングは、「誰かがサイトを閲覧したとき」です。このため、誰もサイトにアクセスしない場合は、たとえ確認間隔を「5分」に設定しても、1時間以上メールが読み込まれないことがあり得ます。</li>
-    <li>手動でメールボックス確認させる URL &lt;http://(WordPressのアドレス)/wp-content/plugins/ktai_entry/retrieve.php&gt; をウェブ経由でアクセスした場合、設定した読み出し時間を過ぎていない限り、メール確認処理は行なわれません。しかし、_wpnonce 引数 (12時間ごとに変化) をつけたり、コマンドラインから retrieve.php を起動させた場合 (_wpnonce は不要) は即時実行します。</li>
+    <li>手動でメールボックス確認させる URL &lt;http://(WordPressのアドレス)/wp-content/plugins/ktai-entry/inc/retrieve.php&gt; をウェブ経由でアクセスした場合、設定した読み出し時間を過ぎていない限り、メール確認処理は行なわれません。しかし、_wpnonce 引数 (12時間ごとに変化) をつけたり、コマンドラインから retrieve.php を起動させた場合 (_wpnonce は不要) は即時実行します。</li>
   </ul></li>
   <li>(メール着信時に投稿スクリプトを起動する方式に関する注意)<ul>
     <li>レンタルサーバーではまず動作しないと考えてください。メールサーバーとウェブサーバーが別マシンだったり、シェルアカウントがなかったり、.qmail/.forward/.procmail の編集ができなかったり、任意のメールアドレスを追加できなかったり、関門が多いためです。自宅サーバーの場合は、うまく設置できることが多いでしょう。がんばってください。</li>
@@ -364,47 +414,53 @@ ROT:R</pre>
 
 <h4 id="filters">独自フィルターフック</h4>
 <p>Ktai Entry は以下の独自フィルターフックを備えています。差出人アドレス確認の結果、画像リンクの XHTML 記述や、投稿本文の記述を自分好みに変更することができます。</p>
-<p>my-hacks.php などにフィルター関数を記述し、同時に <code>add_filter('image_link/ktai_style.php', '(フィルター関数名)', 10, 3);</code> などと書けば、フィルターフックが有効になります。</p>
+<p>my-hacks.php や自作プラグインファイルにフィルター関数を記述し、同時に <code>add_filter('ktai_image_link', '(フィルター関数名)', 10, 3);</code> などと書けば、フィルターフックが有効になります。</p>
 <dl class="itemize">
-<dt id="retrieve_interval">retrieve_interval/ktai_entry.php</dt>
+<dt id="ktai_retrieve_interval">ktai_retrieve_interval</dt>
 <dd>引数: <code>$interval</code><br />
-外部メールボックスを読み出す間隔 (分単位) をフィルターします。0 にすると読み出ししません。</dd>
-<dt id="validate_address">validate_address/ktai_entry.php</dt>
+外部メールボックスを読み出す間隔 (分単位) をフィルターします。0 または -1 にすると読み出ししません。</dd>
+<dt id="ktai_validate_address">ktai_validate_address</dt>
 <dd>引数: <code>$user_id, $address</code><br />
 差出人メールアドレスから、ウェブログ登録ユーザー ID を割り出した結果をフィルターします。登録ユーザー以外に別途許可したいアドレスがある場合や、投稿作成者は管理者に固定したい場合などに使います。</dd>
-<dt id="post_category">post_category/ktai_entry.php</dt>
+<dt id="ktai_post_category">ktai_post_category</dt>
 <dd>引数: <code>$categories</code><br />
 投稿するカテゴリーをフィルターします。<code>$categories</code> はカテゴリー設定／追加／変更コマンドなどを適用した結果で、カテゴリー ID が入った配列です。少なくとも1つの要素があります。</dd>
-<dt id="post_keywords">post_keywords/ktai_entry.php</dt>
+<dt id="ktai_post_keywords">ktai_post_keywords</dt>
 <dd>引数: <code>$keywords</code><br />
 投稿に付与するキーワードタグをフィルターします。<code>$keywords</code> はコンマ区切りのタグ一覧文字列です。</dd>
-<dt id="image_rotate">image_rotate/ktai_entry.php</dt>
+<dt id="ktai_image_rotate">ktai_image_rotate</dt>
 <dd>引数: <code>$rotations, $rot_direction, $images</code><br />
 画像の回転コマンドをフィルターします。<code>$rotations</code> は回転指示を示す配列です。画像枚数だけの要素があり、N, L, R のいずれかの文字が入っています。<code>$rot_direction</code> は回転コマンド文字列そのものです。<code>$images</code> は画像の配列 (2次元配列) です。n は0で始まるインデックス番号で、$images[n]['name'] がファイル名、$images[n]['p_type'] が MIME プライマリータイプ (image)、$images[n]['s_type'] が MIME セカンダリータイプ (jpeg, png, gif など)、$images[n]['body'] が画像データーそのものです。</dd>
-<dt id="post_name">post_name/ktai_entry.php</dt>
+<dt id="ktai_post_name">ktai_post_name</dt>
 <dd>引数: <code>$post_name, $contents</code><br />
 投稿スラッグをフィルターします。<code>$post_name</code> は投稿スラッグの文字列です。<code>$contents</code> は投稿内容を示すオブジェクトです (オブジェクトのメンバーはソースを見てください ;-)。返り値を空にするとデフォルトのスラッグ (時分秒を繋げた6ケタの数字) になります。</dd>
-<dt id="post_date">post_date/ktai_entry.php</dt>
+<dt id="ktai_post_date">ktai_post_date</dt>
 <dd>引数: <code>$date_string, $images</code><br />
 投稿日時指定をフィルターします。<code>$date_string</code> は日時指定コマンドの文字列です。<code>$images</code> は画像の配列です。返り値を空にするとデフォルトの投稿日時 (Date: フィールドの日時) となります。</dd>
-<dt id="post_status">post_status/ktai_entry.php</dt>
-<dd>引数: <code>$status, $can_pending, $user_id, $address</code><br />
-投稿者が利用可能な投稿ステータスをフィルターします。<code>$status</code> は、publish (公開), pending (レビュー待ち), draft (下書き), NULL値 (投稿不可) のいずれかで、投稿者の権限によって決められます。返り値は、この4つに加えて private (非公開) も使えます。<code>$can_pending</code> は WordPress 2.3 以降ならば true で、「レビュー待ち (pending)」が使えることを示します。 <code>$user_id, $address</code> はそれぞれ投稿者のユーザー ID およびメールの差出人アドレスです。このフィルターを使うと、「講読者にはメール投稿は許可する」「この編集者ではメール投稿を不許可」などの設定ができます。</dd>
-<dt id="image_link">image_link/ktai_entry.php</dt>
+<dt id="ktai_post_status">ktai_post_status</dt>
+<dd>引数: <code>$status, true, $user_id, $address</code><br />
+投稿者が利用可能な投稿ステータスをフィルターします。<code>$status</code> は、publish (公開), pending (レビュー待ち), draft (下書き), NULL値 (投稿不可) のいずれかで、投稿者の権限によって決められます。返り値は、この4つに加えて private (非公開) も使えます。true の部分は常に true が入ります (過去との互換性のための引数)。 <code>$user_id, $address</code> はそれぞれ投稿者のユーザー ID およびメールの差出人アドレスです。このフィルターを使うと、「講読者にはメール投稿は許可する」「この編集者ではメール投稿を不許可」などの設定ができます。</dd>
+<dt id="ktai_image_link">ktai_image_link</dt>
 <dd>引数: <code>$html, $id, $size</code><br />
-各画像を表示する XHTML をフィルターします。<code>$html</code> は <code>get_the_attachment_link()</code> (WordPress 2.3 以前) または <code>wp_get_attachment_link()</code> (WordPress 2.5 以降) の結果です。<code>$id</code> は画像の post ID、<code>$size</code> は挿入する画像サイズで、サムネールを意味する false (WordPress 2.3 以前) または medium, thumbnail のいずれか (WordPress 2.5 以降) です。</dd>
-<dt id="media_to_html">media_to_html/ktai_entry.php</dt>
+各画像を表示する XHTML をフィルターします。<code>$html</code> は <code>wp_get_attachment_link()</code> の結果です。<code>$id</code> は画像の post ID、<code>$size</code> は挿入する画像サイズで、medium, thumbnail のいずれかです。</dd>
+<dt id="ktai_media_to_html">ktai_media_to_html</dt>
 <dd>引数: <code>$html, $content, $img</code><br />
 画像を挿入した投稿本文をフィルターします。<code>$html</code> は投稿本文、<code>$content</code> は画像挿入前のテキスト、<code>$img</code> は画像ごとの XHTML が入った配列です。</dd>
+<dt id="ktai_notify_subject">ktai_notify_subject</dt>
+<dd>引数: <code>$subject, $blogname, $post, $poster</code><br />
+Ktai Entry のメソッド notofy_publish() で送信される通知メールの題名 (Subject) をフィルターします。<code>$blogname</code> はブログ名、<code>$post</code> は投稿オブジェクト (<code>$post->post_title</code> が投稿タイトル等)、<code>$poster</code> は投稿者オプジェクト (<code>$poster->display_name</code> が名前) です。notify_publish() の使い方は「<a href="DOCUMENTS/Q_and_A.ja.html#notify_publish">メール投稿されたら管理者にメールが届くようにしたい</a>」を参照してください。</dd>
+<dt id="ktai_notify_message">ktai_notify_message</dt>
+<dd>引数: <code>$subject, $blogname, $post, $poster</code><br />
+Ktai Entry のメソッド notofy_publish() で送信される通知メールの本文をフィルターします。<code>$blogname</code> はブログ名、<code>$post</code> は投稿オブジェクト (<code>$post->post_title</code> で投稿タイトル等)、<code>$poster</code> は投稿者オプジェクト (<code>$poster->display_name</code> が名前) です。</dd>
 </dl>
 
 <h4 id="logging">ログ機構</h4>
-<p>投稿がうまく処理されないときの問題点の洗い出し、不正アクセスの検出などのために、メール投稿処理のログを取ることができます。ktai_entry.php の 27 行目にある <code>//define('KE_LOGFILE', 'logs/error.log');</code> のコメントを外します。すると、ktai_entry ディレクトリー配下の log ディレクトリーに error.log が作られます。念のため、手動で log ディレクトリーおよび error.log ファイルを作成して、chmod 0777 および chmod 1666 しておいた方が確実です。</p>
+<p>投稿がうまく処理されないときの問題点の洗い出し、不正アクセスの検出などのために、メール投稿処理のログを取ることができます。ktai_entry.php の 32 行目にある <code>//define('KE_LOGFILE', 'logs/error.log');</code> のコメントを外します。すると、ktai_entry ディレクトリー配下の log ディレクトリーに error.log が作られます。念のため、手動で log ディレクトリーおよび error.log ファイルを作成して、chmod 0777 および chmod 1666 しておいた方が確実です。</p>
 <p>外部メールボックスに随時アクセスの場合、メールチェックの度にログされますので、5分間隔の場合、1日で16000行以上記録されるかもしれません。</p>
 <p>古いログの圧縮や削除は行ないませんので、logrotate(8) の対象にするか、手動で圧縮や削除を行なってください。そのまま放置すると、巨大なテキストファイルになり、問題が発生することがあります。</p>
-<p>ktai_entry.php の 28 行目 <code>//define('KE_DEBUG', true);</code> のコメントを外すとデバッグモードになり、さらに詳細な動作ログを取ることができます。管理パネルのメール投稿から、外部メールボックスの手動確認リンクをクリックした場合は、詳細な動作ログを画面でも確認できます。</p>
-<p>ログメッセージは原則的に英語です。文字化けして読めない場合を避けるためです。簡単な英語ですので、がんばって読んでみてください。しかし、ktai_entry.php の 77 行目のコメントを外して「<code>$this-&gt;load_textdomain('ktai_entry_log', 'lang');</code>」を有効にすると日本語化できます。文字コードはウェブログの文字コード (UTF-8 等) と同じです。ただし、メールサーバーに返答するためのメッセージ、および外部のメールボックスから返されたメッセージは英語のままです。</p>
-<p>ログメッセージの解説および対処法は、「<a href="ERRORS.ja.html">エラーメッセージ</a>」を参照してください。</p>
+<p>ktai_entry.php の 33 行目 <code>//define('KE_DEBUG', true);</code> のコメントを外すとデバッグモードになり、さらに詳細な動作ログを取ることができます。管理パネルのメール投稿から、外部メールボックスの手動確認リンクをクリックした場合は、詳細な動作ログを画面でも確認できます。</p>
+<p>ログメッセージは原則的に英語です。文字化けして読めない場合を避けるためです。簡単な英語ですので、がんばって読んでみてください。しかし、ktai_entry.php の 112 行目のコメントを外して「<code>load_plugin_textdomain('ktai_entry_log', ...</code>」を有効にすると日本語化できます。文字コードはウェブログの文字コード (UTF-8 等) と同じです。ただし、メールサーバーに返答するためのメッセージ、および外部のメールボックスから返されたメッセージは英語のままです。</p>
+<p>ログメッセージの解説および対処法は、「<a href="DOCUMENTS/ERRORS.ja.html">エラーメッセージ</a>」を参照してください。</p>
 
 <h3 id="differences">他のメール投稿ツールとの相違点</h3>
 
@@ -520,7 +576,20 @@ ROT:R</pre>
 <h2 id="history">改版履歴</h2>
 
 <dl class="itemize">
-<dt id="ver090">ver 0.8.11 (2009-11-20)</dt>
+<dt id="ver090">ver 0.9.0 (2011-09-02)</dt>
+<dd><ul>
+  <li>動作対象を WordPress 2.6 以降としました。これにより、UTF-8 動作のみ動作保証します。(XOOPS モジュール版 WordPress などの EUC-JP 動作はサポート外)</li>
+  <li>デコメ絵文字に対応しました。デコメ絵文字は添付画像として処理され、メディアライブラリに格納されます。ただし、Flash で作られた動く絵文字は対応していません。</li>
+  <li>外部メールボックスを定期的に読み込むトリガーを WordPress 標準の wp-cron 動作に変更しました。これにより、携帯電話でのウェブログ閲覧でもメール取り込み動作が行なわれます。</li>
+  <li>新規投稿を管理者に通知できるようにしました。</li>
+  <li>WordPress MU 2.8 以降で「プラグインをサイト全体で使用する」を実行した場合に、正しく動作するようにしました。</li>
+  <li>「メール着信時に投稿スクリプトを起動させる方法」を WordPress MU および WordPress 3.0 以降のマルチサイト設置に対応しました。各サイトごとに投稿メールアドレスを作り、wp-config.php を編集して wp-content/sunrise.php ファイルを設置する必要があります (詳細は設置方法を参照)。</li>
+  <li>投稿時のテンプレートを変更しました。これにより、画像の配置を左側以外に設定できるようになりました。(<a href="http://sourceforge.jp/ticket/browse.php?group_id=2362&amp;tid=16637">チケット#16637</a>)</li>
+  <li>WordPress 2.7 から導入された「大サイズ」に対応しました。</li>
+  <li>独自フィルターフックの名称を xxxxx/ktai_entry.php から ktai_xxxxx という形に改名しました。</li>
+  <li>inject.php, retrieve.php, post.php 等を inc サブディレクトリーに移設しました。これらのファイルを参照している場合、パスの修正が必要です。</li>
+</ul></dd>
+<dt id="ver0811">ver 0.8.11 (2009-11-20)</dt>
 <dd><ul>
   <li>添付ファイルの名前が二重拡張子になっている場合、余分なドットを削除するようにしました。<strong>*** これは一部の Apache 設定における脆弱性に対応するセキュリティー修正です***</strong></li>
   <li>ファイル名に半角スペースが含まれる場合、アンダースコア (_) に置換するようにしました (従来はスペースを削除していました)。</li>

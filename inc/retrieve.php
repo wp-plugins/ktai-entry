@@ -3,11 +3,18 @@
  *   Retrieve messages from external mailbox
    ================================================== */
 
-$wpload_error = 'Could not retrieve messages because custom WP_PLUGIN_DIR is set.';
-require dirname(__FILE__) . '/wp-load.php';
+/*
+	If you want to use cron, write crontabl below:
+	2,17,32,47 * * * * /usr/bin/php /PATH/TO/WP/wp-content/plugins/ktai_entry/inc/retrieve.php
+ */
 
+if ( !defined('ABSPATH') ) {
+	global $wpload_error;
+	$wpload_error = 'Could not retrieve messages because custom WP_PLUGIN_DIR is set.';
+	require dirname(dirname(__FILE__)) . '/wp-load.php';
+}
 header('Content-Type: text/html; charset=' . get_bloginfo('charset'));
-if (! class_exists('Ktai_Entry')) {
+if ( !class_exists('KtaiEntry') ) {
 	header("HTTP/1.0 501 Not Implemented");
 ?>
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
@@ -21,49 +28,41 @@ The plugin is not activated.
 	exit;
 }
 
-global $Ktai_Entry;
-$mail = new Ktai_Entry_Retrieve($Ktai_Entry);
-require dirname(__FILE__) . '/post.php';
-require dirname(__FILE__) . '/class-pop3.php';
-$count = $mail->connect();
-if ($count) {
-	$mail->retrieve($count);
-}
-_e('/* Retrieval completed. */', 'ktai_entry_log');
-exit;
-
 /* ==================================================
- *   Ktai_Entry_Retrieve class
+ *   KtaiEntry_Retrieve class
    ================================================== */
 
-class Ktai_Entry_Retrieve {
-	private $parent;
-	private $return_css;
+class KtaiEntry_Retrieve extends KtaiEntry {
 	private $post;
 	private $pop3;
 
 // ==================================================
-public function __construct($parent) {
-	$this->parent = $parent;
-	$this->return_css = false;
-
+public function __construct() {
 	if (isset($_SERVER['HTTP_HOST'])) {
-		if (isset($_GET['_wpnonce'])) {
-			if (! $this->verify_nonce($_GET['_wpnonce'], 'ktai-entry-retrieve')) {
-				$this->parent->http_error(400, __('Your request could not be understood by the server due to malformed syntax.', 'ktai_entry_log'));
-				// exit;
-			}
-		} else {
-			$this->return_css = true;
-			header('Content-Type: text/css; charset=UTF-8');
-			if (! Ktai_Entry::elapsed_interval()) {
-				_e('/* Retrieval interval does not elapsed. */', 'ktai_entry_log');
-				exit;
-			}
+		if (isset($_GET['_wpnonce']) 
+		&& ! $this->verify_nonce($_GET['_wpnonce'], 'ktai-entry-retrieve')) {
+			$this->http_error(400, __('Your request could not be understood by the server due to malformed syntax.', 'ktai_entry_log'));
+			// exit;
+		} elseif (! $this->elapsed_interval()) {
+			$this->display_as_html('Retrieval interval does not elapsed.', 'ktai_entry_log');
+			exit;
 		}
 	}
 	update_option('ke_last_checked', time());
 	return;
+}
+
+/* ==================================================
+ * @param	none
+ * @return	boolean  $elapsed
+ */
+private function elapsed_interval() {
+	$last_checked = get_option('ke_last_checked');
+	$interval     = apply_filters('ke_retrieve_interval', $this->get_option('ke_retrieve_interval'));
+	if ($interval <= 0 || $last_checked < 0 || $interval * 60 > (time() - $last_checked)) {
+		return false;
+	}
+	return true;
 }
 
 // ==================================================
@@ -79,16 +78,19 @@ public function connect() {
 		|| empty($server_login) || $server_login == 'login@example.com'
 		|| $server_pass == 'password'
 		) {
-		$this->parent->http_error(502, __('The POP3 config is not valid.', 'ktai_entry_log'));
+		$this->http_error(502, __('The POP3 config is not valid.', 'ktai_entry_log'));
 		// exit;
 	}
 
+	require dirname(__FILE__) . '/post.php';
+	require dirname(__FILE__) . '/class-pop3.php';
+
 	$format = $this->return_css ? 'text' : 'html';
-	$this->post = new Ktai_Entry_Post('pop', $format);
+	$this->post = new KtaiEntry_Post('pop', $format);
 	$this->pop3 = new KE_POP3();
 	$this->pop3->ALLOWAPOP = $this->post->get_option('ke_use_apop');
 	if (! $this->pop3->connect($server_url, $server_port)) {
-		$this->parent->http_error(502, $this->pop3->ERROR);
+		$this->http_error(502, $this->pop3->ERROR);
 	}
 	if ($this->post->get_option('ke_use_apop')) {
 		$count = $this->pop3->apop($server_login, $server_pass);
@@ -99,7 +101,7 @@ public function connect() {
 	if (false === $count || $count < 0) {
 		$error = $this->pop3->ERROR;
 		$this->pop3->quit();
-		$this->parent->http_error(502, $error);
+		$this->http_error(502, $error);
 		// exit;
 	} elseif (0 == $count) {
 		$this->pop3->quit();
@@ -116,21 +118,29 @@ public function retrieve($count) {
 		$lines = $this->pop3->get($i);
 		$contents = $this->post->parse(str_replace("\r\n", "\n", implode('', $lines)));
 		if (is_ke_error($contents)) {
-			$this->display(sprintf(__('Error at #%1$d: %2$s', 'ktai_entry_log'), $i, $contents->getMessage()));
+			$message = sprintf(__('Error at #%1$d: %2$s', 'ktai_entry_log'), $i, $contents->getMessage());
+			do_action('ktai_retrieve_parse_error', $message, $contents);
+			$this->display($message);
 			continue;
 		}
 		$result = $this->post->insert($contents);
 		if (is_ke_error($result)) {
-			$this->display(sprintf(__('Error at #%1$d: %2$s', 'ktai_entry_log'), $i, $result->getMessage()));
+			$message = sprintf(__('Error at #%1$d: %2$s', 'ktai_entry_log'), $i, $result->getMessage());
+			do_action('ktai_retrieve_insert_error', $message, $contents);
+			$this->display($message);
 			continue;
 		}
 		if (! $this->pop3->delete($i)) {
 			$error = $this->pop3->ERROR;
 			$this->pop3->reset();
-			$this->display(sprintf(__('Can\'t delete message #%1$d: %2$s', 'ktai_entry_log'), $i, $error));
+			$message = sprintf(__('Can\'t delete message #%1$d: %2$s', 'ktai_entry_log'), $i, $error);
+			do_action('ktai_retrieve_delete_error', $message, $i);
+			$this->display($message);
 			break;
 		} else {
-			$this->display(sprintf(__('Mission complete, message "%d" deleted.', 'ktai_entry_log'), $i));
+			$message = sprintf(__('Mission complete, message "%d" deleted.', 'ktai_entry_log'), $i);
+			do_action('ktai_retrieve_complete', $message, $contents);
+			$this->display($message);
 		}
 	endfor;
 
@@ -145,7 +155,7 @@ public function retrieve($count) {
  * based on wp_verify_nonce at wp-includes/pluggable.php at WP 2.5
  */
 private function verify_nonce($nonce, $action = -1) {
-	$i = ceil(time() / 43200);
+	$i = wp_nonce_tick();
 	// Nonce generated 0-12 hours ago
 	if ( substr(wp_hash($i . $action), -12, 10) == $nonce )
 		return 1;
@@ -160,16 +170,20 @@ private function verify_nonce($nonce, $action = -1) {
  * @param	string   $message
  * @return	none
  */
-private function display($message) {
-	if (! $this->return_css) {
-		$this->parent->display_as_html($message);
-	} elseif (defined('KE_DEBUG')) {
-		$this->parent->display_as_comment($message);
-	}
-	$this->parent->logging($message);
+public function display($message) {
+	$this->display_as_html($message);
+	$this->logging($message);
 	return;
 }
 
 // ===== End of class ====================
 }
+
+global $Ktai_Entry;
+$mail = new KtaiEntry_Retrieve($Ktai_Entry);
+$count = $mail->connect();
+if ($count) {
+	$mail->retrieve($count);
+}
+$mail->display(__('Retrieval completed.', 'ktai_entry_log'));
 ?>

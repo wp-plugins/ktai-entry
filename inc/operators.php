@@ -6,22 +6,70 @@
  */
 
 /* ==================================================
- *   Ktai_Entry_Operator class
+ *   KtaiEntry_Operator class
    ================================================== */
 
-class Ktai_Entry_Operator {
+class KtaiEntry_Operator {
+	private $base;
+
+/* ==================================================
+ * @param	string   $address
+ * @return	none
+ */
+public static function factory($address, $method) {
+	$is_yahoo = ($method == 'pop' && preg_match('/pop\.mail\.yahoo\.co\.jp$/i', get_option('mailserver_url')));
+	if (preg_match('/@(ezweb\.ne|auone)\.jp$/i', $address)) {
+		$operator = new KtaiEntry_EZweb();
+		$type = 'KDDI';
+	} elseif (preg_match('/@((\w+\.)?pdx\.ne\.jp|willcom\.com)$/i', $address)) {
+		$operator = new KtaiEntry_WILLCOM();
+		$type = 'WILLCOM';
+	} elseif (preg_match('/@docomo\.ne\.jp$/i', $address)) {
+		if ($is_yahoo) {
+			$operator = new KtaiEntry_imode_ISO();
+			$type = 'DoCoMo (JIS)';
+		} else {
+			$operator = new KtaiEntry_imode_SJIS();
+			$type = 'DoCoMo';
+		}
+	} elseif (preg_match('/@emnet\.ne\.jp$/i', $address)) {
+		$operator = new KtaiEntry_EMNet();
+		$type = 'EMOBILE';
+	} elseif (preg_match('/@((softbank|disney|[dhrtcknsq]\.vodafone)\.ne|i\.softbank)\.jp$/i', $address)) {
+		if ($is_yahoo) {
+			$operator = new KtaiEntry_SoftBank_ISO();
+			$type = 'SoftBank/Disney (JIS)';
+		} else {
+			$operator = new KtaiEntry_SoftBank_SJIS();
+			$type = 'SoftBank/Disney';
+		}
+	} else {
+		$operator = NULL;
+		$type = __('(N/A)', 'ktai_entry_log');
+	}
+	return array($operator, $type);
+}
+
+/* ==================================================
+ * @param	none
+ * @return	none
+ */
+public function __construct() {
+	global $Ktai_Entry;
+	$this->base = $Ktai_Entry;
+}
 
 /* ==================================================
  * @param	string   $buffer
- * @param	string   $charset
+ * @param	string   $encoding
  * @return	string   $buffer
  */
-protected function pickup_iso_pics($buffer, $charset, $pics) {
-	if ($charset == 'auto') {
-		$charset = mb_detect_encoding($buffer, KE_DETECT_ORDER);
-		Ktai_Entry::logging("Detect content encoding as '$charset' to pickup pictgrams.");
+protected function pickup_iso_pictograms($buffer, $encoding, $pictograms) {
+	if ($encoding == 'auto') {
+		$encoding = $this->base->encode->guess($buffer);
+		KtaiEntry::logging("Detect content encoding as '$encoding' to pickup pictgrams.");
 	}
-	if (strtolower($charset) == 'iso-2022-jp') {
+	if ( $this->base->encode->similar($encoding, 'ISO-2022-JP') ) {
 		for ($offset = 0 , $replace = 'X' ;
 			 preg_match('/\x1b\$B([\x21-\x7e]+)\x1b\(B/', $buffer, $sequence, PREG_OFFSET_CAPTURE, $offset); //)
 			 $offset += strlen($replace)) 
@@ -31,8 +79,8 @@ protected function pickup_iso_pics($buffer, $charset, $pics) {
 			$chars   = $sequence[1][0];
 			$replace = "\x1b\$B";
 			for ($i = 0 ; $i < strlen($chars) -1 ; $i += 2) {
-				if (isset($pics[$chars[$i] . $chars[$i+1]])) {
-					$replace .= sprintf("\x1b(B<img localsrc=\"%s\" />\x1b\$B", $pics[$chars[$i] . $chars[$i+1]]); //)
+				if (isset($pictograms[$chars[$i] . $chars[$i+1]])) {
+					$replace .= sprintf("\x1b(B<img localsrc=\"%s\" />\x1b\$B", $pictograms[$chars[$i] . $chars[$i+1]]); //)
 				} else {
 					$replace .= $chars[$i] . $chars[$i+1];
 				}
@@ -50,17 +98,16 @@ protected function pickup_iso_pics($buffer, $charset, $pics) {
  * @param	string   $charset
  * @return	string   $buffer
  */
-protected function pickup_docomo_sjis($buffer, $charset, $pics) {
-	mb_regex_encoding('SJIS-win');
-	$replaced = mb_ereg_replace(
+protected function pickup_docomo_sjis($buffer, $charset, $pictograms) {
+	$replaced = $this->base->encode->replace(
 		"([\xf8\x40-\xf8\x5b]|[\xf8\x5d-\xf8\xfc]|[\xf9\x40-\xf9\x5b]|[\xf9\x5d-\xf9\xfc])", 
-		'isset($pics["\1"]) ? 
-		"<img localsrc=\"" . $pics["\1"] . "\" />" : 
+		'isset($pictograms["\1"]) ? 
+		"<img localsrc=\"" . $pictograms["\1"] . "\" />" : 
 		"<img localsrc=\"d\" alt=\"" . "[0x" . bin2hex("\1") . "]\" />"', 
-		$buffer, 'e');
+		$buffer, 'SJIS-win', 'e');
 	if ($replaced) {
-		$replaced = mb_ereg_replace("\xf8\x5c", '<img localsrc="d" alt="[0xf85c]" />', $replaced);
-		$replaced = mb_ereg_replace("\xf9\x5c", '<img localsrc="' . $pics["\xf9\x5c"] . '" />', $replaced);
+		$replaced = $this->base->encode->replace("\xf8\x5c", '<img localsrc="d" alt="[0xf85c]" />', $replaced, 'SJIS-win');
+		$replaced = $this->base->encode->replace("\xf9\x5c", '<img localsrc="' . $pictograms["\xf9\x5c"] . '" />', $replaced, 'SJIS-win');
 	}
 	return $replaced ? $replaced : $buffer;
 }
@@ -70,18 +117,17 @@ protected function pickup_docomo_sjis($buffer, $charset, $pics) {
  * @param	string   $charset
  * @return	string   $buffer
  */
-protected function pickup_sbm_sjis($buffer, $charset, $pics) {
-	mb_regex_encoding('SJIS-win');
-	$replaced = mb_ereg_replace(
+protected function pickup_sbm_sjis($buffer, $charset, $pictograms) {
+	$replaced = $this->base->encode->replace(
 		"([\xf7\x40-\xf7\x5b]|[\xf7\x5d-\xf7\xfc]|[\xf9\x40-\xf9\x5b]|[\xf9\x5d-\xf9\xfc]|[\xfb\x40-\xfb\x5b]|[\xfb\x5d-\xfb\xfc])", 
-		'isset($pics["\1"]) ? 
-		"<img localsrc=\"" . $pics["\1"] . "\" />" : 
+		'isset($pictograms["\1"]) ? 
+		"<img localsrc=\"" . $pictograms["\1"] . "\" />" : 
 		"<img localsrc=\"se\" alt=\"" . "[0x" . bin2hex("\1") . "]\" />"', 
-		$buffer, 'e');
+		$buffer, 'SJIS-win', 'e');
 	if ($replaced) {
-		$replaced = mb_ereg_replace("\xf7\x5c", '<img localsrc="se11c" />', $replaced);
-		$replaced = mb_ereg_replace("\xf9\x5c", '<img localsrc="se01c" />', $replaced);
-		$replaced = mb_ereg_replace("\xfb\x5c", '<img localsrc="se41c" />', $replaced);
+		$replaced = $this->base->encode->replace("\xf7\x5c", '<img localsrc="se11c" />', $replaced, 'SJIS-win');
+		$replaced = $this->base->encode->replace("\xf9\x5c", '<img localsrc="se01c" />', $replaced, 'SJIS-win');
+		$replaced = $this->base->encode->replace("\xfb\x5c", '<img localsrc="se41c" />', $replaced, 'SJIS-win');
 	}
 	return $replaced ? $replaced : $buffer;
 }
@@ -90,12 +136,12 @@ protected function pickup_sbm_sjis($buffer, $charset, $pics) {
 }
 
 /* ==================================================
- *   Ktai_Entry_EZweb class
+ *   KtaiEntry_EZweb class
    ================================================== */
 
-class Ktai_Entry_EZweb extends Ktai_Entry_Operator {
+class KtaiEntry_EZweb extends KtaiEntry_Operator {
 	// http://www.au.kddi.com/ezfactory/tec/spec/3.html
-	static public $pics_iso = array (
+	public static $pictograms_iso = array (
 		"\x75\x3a" => '1'  , // 「!」
 		"\x75\x3b" => '2'  , // 「!」
 		"\x75\x3c" => '3'  , // 「?」
@@ -744,20 +790,20 @@ class Ktai_Entry_EZweb extends Ktai_Entry_Operator {
  * @param	string   $charset
  * @return	string   $buffer
  */
-public function pickup_pics($buffer, $charset) {
-	return $this->pickup_iso_pics($buffer, $charset, self::$pics_iso);
+public function pickup_pictograms($buffer, $charset) {
+	return $this->pickup_iso_pictograms($buffer, $charset, self::$pictograms_iso);
 }
 
 // ===== End of class ====================
 }
 
 /* ==================================================
- *   Ktai_Entry_imode_SJIS class
+ *   KtaiEntry_imode_SJIS class
    ================================================== */
 
-class Ktai_Entry_imode_SJIS extends Ktai_Entry_Operator {
+class KtaiEntry_imode_SJIS extends KtaiEntry_Operator {
 	// http://www.nttdocomo.co.jp/service/imode/make/content/pictograph/
-	static public $pics_sjis = array(
+	public static $pictograms_sjis = array(
 		"\xf8\x9f" => 'd001', // 晴れ
 		"\xf8\xa0" => 'd002', // 曇り
 		"\xf8\xa1" => 'd003', // 雨
@@ -1014,12 +1060,12 @@ class Ktai_Entry_imode_SJIS extends Ktai_Entry_Operator {
 
 /* ==================================================
  * @param	string   $buffer
- * @param	string   $charset
+ * @param	string   $encoding
  * @return	string   $buffer
  */
-public function pickup_pics($buffer, $charset) {
-	if (strtolower($charset) == 'shift_jis' || strtolower($charset) == 'sjis' || strtolower($charset) == 'cp932') {
-		$buffer = $this->pickup_docomo_sjis($buffer, $charset, self::$pics_sjis);
+public function pickup_pictograms($buffer, $encoding) {
+	if ( $this->base->encode->similar($encoding, 'Shift_JIS') ) {
+		$buffer = $this->pickup_docomo_sjis($buffer, $charset, self::$pictograms_sjis);
 	}
 	return $buffer;
 }
@@ -1028,12 +1074,12 @@ public function pickup_pics($buffer, $charset) {
 }
 
 /* ==================================================
- *   Ktai_Entry_WILLCOM class
+ *   KtaiEntry_WILLCOM class
    ================================================== */
 
-class Ktai_Entry_WILLCOM extends Ktai_Entry_imode_SJIS {
+class KtaiEntry_WILLCOM extends KtaiEntry_imode_SJIS {
 	// http://www.willcom-inc.com/ja/service/contents_service/club_air_edge/for_phone/homepage/pdf/contents_reference.pdf
-	static public $pics_willcom = array(
+	public static $pictograms_willcom = array(
 		'<#HEART>'     => 'wf040', // ハート
 		'<#CLOCK>'     => 'wf041', // 掛時計
 		'<#TELEPHONE>' => 'wf042', // 電話
@@ -1201,12 +1247,12 @@ class Ktai_Entry_WILLCOM extends Ktai_Entry_imode_SJIS {
 
 /* ==================================================
  * @param	string   $buffer
- * @param	string   $charset
+ * @param	string   $encoding
  * @return	string   $buffer
  */
-public function pickup_pics($buffer, $charset) {
-	$buffer = preg_replace('|(<#[-_0-9A-Z/!]+>)|e', '"<img localsrc=\"" . self::$pics_willcom["$1"] . "\" />"', $buffer);
-	$buffer = $this->pickup_docomo_sjis($buffer, $charset, parent::$pics_sjis);
+public function pickup_pictograms($buffer, $encoding) {
+	$buffer = preg_replace('|(<#[-_0-9A-Z/!]+>)|e', '"<img localsrc=\"" . self::$pictograms_willcom["$1"] . "\" />"', $buffer);
+	$buffer = $this->pickup_docomo_sjis($buffer, $encoding, parent::$pictograms_sjis);
 	return $buffer;
 }
 
@@ -1214,19 +1260,19 @@ public function pickup_pics($buffer, $charset) {
 }
 
 /* ==================================================
- *   Ktai_Entry_EMNet class
+ *   KtaiEntry_EMNet class
    ================================================== */
 
-class Ktai_Entry_EMNet extends Ktai_Entry_imode_SJIS {
+class KtaiEntry_EMNet extends KtaiEntry_imode_SJIS {
 }
 
 /* ==================================================
- *   Ktai_Entry_imode_ISO class
+ *   KtaiEntry_imode_ISO class
    ================================================== */
 
-class Ktai_Entry_imode_ISO extends Ktai_Entry_Operator {
-	private $pics;
-	static public $pics_iso = array (
+class KtaiEntry_imode_ISO extends KtaiEntry_Operator {
+	private $pictograms;
+	public static $pictograms_iso = array (
 		"\x75\x41" => 'd001', // 晴れ
 		"\x75\x46" => 'd002', // 曇り
 		"\x75\x45" => 'd003', // 雨
@@ -1484,22 +1530,22 @@ class Ktai_Entry_imode_ISO extends Ktai_Entry_Operator {
 /* ==================================================
  * @param	string   $buffer
  * @param	string   $charset
- * @return	string   $buffer
+ * @return	string   $encoding
  */
-public function pickup_pics($buffer, $charset) {
-	return $this->pickup_iso_pics($buffer, $charset, self::$pics_iso);
+public function pickup_pictograms($buffer, $encoding) {
+	return $this->pickup_iso_pictograms($buffer, $encoding, self::$pictograms_iso);
 }
 
 // ===== End of class ====================
 }
 
 /* ==================================================
- *   Ktai_Entry_SoftBank_ISO class
+ *   KtaiEntry_SoftBank_ISO class
    ================================================== */
 
-class Ktai_Entry_SoftBank_ISO extends Ktai_Entry_Operator {
-	private $pics;
-	static public $pics_iso = array (
+class KtaiEntry_SoftBank_ISO extends KtaiEntry_Operator {
+	private $pictograms;
+	public static $pictograms_iso = array (
 		"\x7d\x37" => 'se001', // 男の子
 		"\x7d\x32" => 'se002', // 女の子
 		"\x76\x46" => 'se003', // 美容 (キスマーク)
@@ -1993,22 +2039,22 @@ class Ktai_Entry_SoftBank_ISO extends Ktai_Entry_Operator {
 
 /* ==================================================
  * @param	string   $buffer
- * @param	string   $charset
+ * @param	string   $encoding
  * @return	string   $buffer
  */
-public function pickup_pics($buffer, $charset) {
-	return $this->pickup_iso_pics($buffer, $charset, self::$pics_iso);
+public function pickup_pictograms($buffer, $encoding) {
+	return $this->pickup_iso_pictograms($buffer, $encoding, self::$pictograms_iso);
 }
 
 // ===== End of class ====================
 }
 
 /* ==================================================
- *   Ktai_Entry_SoftBank_SJIS class
+ *   KtaiEntry_SoftBank_SJIS class
    ================================================== */
 
-class Ktai_Entry_SoftBank_SJIS extends Ktai_Entry_Operator {
-	static public $pics_sjis = array(
+class KtaiEntry_SoftBank_SJIS extends KtaiEntry_Operator {
+	public static $pictograms_sjis = array(
 		"\xf9\x41" => 'se001', // 男の子
 		"\xf9\x42" => 'se002', // 女の子
 		"\xf9\x43" => 'se003', // 美容 (キスマーク)
@@ -2501,12 +2547,12 @@ class Ktai_Entry_SoftBank_SJIS extends Ktai_Entry_Operator {
 	);
 /* ==================================================
  * @param	string   $buffer
- * @param	string   $charset
+ * @param	string   $encoding
  * @return	string   $buffer
  */
-public function pickup_pics($buffer, $charset) {
-	if (strtolower($charset) == 'shift_jis' || strtolower($charset) == 'sjis' || strtolower($charset) == 'cp932') {
-		$buffer = $this->pickup_sbm_sjis($buffer, $charset, self::$pics_sjis);
+public function pickup_pictograms($buffer, $encoding) {
+	if ( $this->base->encode->similar($encoding, 'Shift_JIS') ) {
+		$buffer = $this->pickup_sbm_sjis($buffer, $encoding, self::$pictograms_sjis);
 	}
 	return $buffer;
 }

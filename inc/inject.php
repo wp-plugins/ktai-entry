@@ -2,7 +2,17 @@
 /* ==================================================
  *   Read a message from MTAs
    ================================================== */
+/*
+	This script is called from .forward/.qmail/.procamail
+	In your .forward+XXXXX/.qmail-XXXXX etc:
+	| /usr/bin/php /PATH/TO/WP/wp-content/plugins/ktai_entry/inc/inject.php
 
+	If you are using WordPress MU, specify "blog id" with -blog option
+	| /usr/bin/php /PATH/TO/WP/wp-content/plugins/ktai_entry/inc/inject.php -blog 2
+	
+ */
+
+define('KE_BLOGID_OPTION', '-blog');
 define('QMAIL_DELIVERY_SUCCESSFUL', 0);
 define('QMAIL_DELIVERY_SUCCESSFUL_IGNORE_FURTHER', 99);
 define('QMAIL_DELIVERY_FAILED_PERMANENTLY', 100);
@@ -22,11 +32,20 @@ You don't have permission to access the URL on this server.
 	exit;
 }
 
-$wpload_error = 'Could not read messages because custom WP_PLUGIN_DIR is set.';
-$wpload_status = QMAIL_DELIVERY_FAILED_PERMANENTLY;
-require dirname(__FILE__) . '/wp-load.php';
-if (! class_exists('Ktai_Entry')) {
-	echo 'The plugin is not activated.';
+global $blog_id;
+$blog_id = 0;
+if ($argc >= 3 && $argv[1] == KE_BLOGID_OPTION) {
+	$blog_id = intval($argv[2]);
+}
+
+if ( !defined('ABSPATH') ) {
+	global $wpload_error;
+	$wpload_error = 'Could not read messages because custom WP_PLUGIN_DIR is set.';
+	$wpload_status = QMAIL_DELIVERY_FAILED_PERMANENTLY;
+	require dirname(dirname(__FILE__)) . '/wp-load.php';
+}
+if ( !class_exists('KtaiEntry') ) {
+	echo "The plugin is not activated.\n";
 	exit(QMAIL_DELIVERY_FAILED_PERMANENTLY);
 }
 global $Ktai_Entry;
@@ -37,7 +56,11 @@ while ($line = fgets(STDIN, 1024)) {
 	$message .= $line;
 }
 if (strlen($message) <= 3) {
+	$message = file_get_contents('php://stdin');
+}
+if (strlen($message) <= 3) {
 	$error = new KE_Error('The Message is too short.', QMAIL_DELIVERY_FAILED_PERMANENTLY);
+	do_action('ktai_inject_too_short', $error);
 	ke_inject_error($error);
 	// exit;
 }
@@ -47,18 +70,20 @@ if (isset($_ENV['SENDER'])) {
 } elseif (isset($_ENV['SMTPMAILFROM'])) {
 	$sender = $_ENV['SMTPMAILFROM'];
 } else {
-	$sender = __('Unknown', 'ktai_entry_log');
+	$sender = __('Unknown envelope sender', 'ktai_entry_log');
 }
 $Ktai_Entry->debug_print(sprintf(__("***************************\n" . 'Received a %1$d-byte-message from %2$s', 'ktai_entry'), strlen($message), $sender));
 
-$post = new Ktai_Entry_Post('mta', NULL);
-$contents = $post->parse($message);
-if (is_ke_error($contents)) {
-	ke_inject_error($contents);
+$post = new KtaiEntry_Post('mta', NULL);
+$result = $post->parse($message);
+if (is_ke_error($result)) {
+	do_action('ktai_inject_parse_error', $result);
+	ke_inject_error($result);
 	// exit;
 }
-$result = $post->insert($contents);
+$result = $post->insert();
 if (is_ke_error($result)) {
+	do_action('ktai_inject_insert_error', $result);
 	ke_inject_error($result);
 	// exit;
 }
@@ -72,7 +97,7 @@ function ke_inject_error($e) {
 	global $Ktai_Entry;
 	$message = $e->getMessage();
 	$Ktai_Entry->logging($message);
-	echo "$message\n";
+	echo $message . "\n";
 	$code = ($e->getCode() < 0) ? QMAIL_DELIVERY_FAILED_PERMANENTLY : QMAIL_DELIVERY_SUCCESSFUL;
 	exit($code);
 }
