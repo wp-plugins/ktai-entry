@@ -38,12 +38,14 @@ class KtaiEntry_Retrieve extends KtaiEntry {
 
 // ==================================================
 public function __construct() {
-	if (isset($_SERVER['HTTP_HOST'])) {
-		if (isset($_GET['_wpnonce']) 
-		&& ! $this->verify_nonce($_GET['_wpnonce'], 'ktai-entry-retrieve')) {
-			$this->http_error(400, __('Your request could not be understood by the server due to malformed syntax.', 'ktai_entry_log'));
-			// exit;
-		} elseif (! $this->elapsed_interval()) {
+	if ( isset($_SERVER['HTTP_HOST']) ) {
+		if ( isset($_GET['_wpnonce']) ) {
+			if ( !$this->verify_nonce($_GET['_wpnonce'], 'ktai-entry-retrieve')) {
+				$this->http_error(400, __('Your request could not be understood by the server due to malformed syntax.', 'ktai_entry_log'));
+				// exit;
+			}
+			// Go to retireve process.
+		} elseif ( !$this->elapsed_interval() ) {
 			$this->display_as_html('Retrieval interval does not elapsed.', 'ktai_entry_log');
 			exit;
 		}
