@@ -1,0 +1,125 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.8.10\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2009-04-30 00:42+0900\n"
+"Last-Translator: IKEDA Yuriko <yuirko-poedit@yuriko.net>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=Shift_JIS\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Poedit-Language: Japanese\n"
+"X-Poedit-Country: JAPAN\n"
+"X-Poedit-SourceCharset: Shift_JIS\n"
+
+# ----- ktai_entry.php --------------------------------------------------
+msgid "Email Post"
+msgstr "メール投稿"
+
+msgid "Ktai Entry Options"
+msgstr "Ktai Entry オプション"
+
+msgid "Note: To configure POP3 mail server, go <a href=\"options-writing.php\">Writing Options</a>."
+msgstr "※POP3 メールサーバーの設定は、<a href=\"options-writing.php\">投稿設定</a>で行なってください。"
+
+msgid "Mail Server"
+msgstr "メールサーバー"
+
+msgid "Port"
+msgstr "ポート"
+
+msgid "Login Name"
+msgstr "ログイン名"
+
+msgid "Password"
+msgstr "パスワード"
+
+msgid "Server Option"
+msgstr "サーバーオプション"
+
+msgid "Use APOP"
+msgstr "APOP を使用"
+
+msgid "POP3 retrieve interval"
+msgstr "POP3 読み込み間隔"
+
+msgid "Never"
+msgstr "しない"
+
+msgid "5 min"
+msgstr "5分"
+
+msgid "10 min"
+msgstr "10分"
+
+msgid "15 min"
+msgstr "15分"
+
+msgid "20 min"
+msgstr "20分"
+
+msgid "30 min"
+msgstr "30分"
+
+msgid "1 hour"
+msgstr "1時間"
+
+msgid "2 hour"
+msgstr "2時間"
+
+msgid "min"
+msgstr "分"
+
+msgid "<a href=\"%s\">Retrieve messages now</a>."
+msgstr "<a href=\"%s\">すぐにメッセージを読み出す。</a>"
+
+msgid "Posting mail address (option)"
+msgstr "投稿受付メールアドレス (オプション)"
+
+msgid "Reject all mail whose recipients (To: fields) are not this address. DO NOTE write sender addresses."
+msgstr "宛先 (To フィールド) がこのアドレスでないメールは拒否します。差出人アドレスを書いてはいけません。"
+
+msgid "Image size of inserting into post"
+msgstr "投稿に挿入する画像サイズ"
+
+msgid "Max size of the image thumbnail"
+msgstr "サムネイルの最大サイズ"
+
+msgid "Post template if attachment images"
+msgstr "投稿テンプレート (添付画像があるとき)"
+
+msgid "{text}: Body text, {images}: Space separated image elements"
+msgstr "{text}: 本文テキスト、{images}: スペース区切りの画像要素"
+
+msgid "Delete Options"
+msgstr "オプションの削除"
+
+msgid "Delete option values and revert them to default &raquo;"
+msgstr "オプション値を削除してデフォルトに戻す &raquo;"
+
+msgid "Do you really delete option values and revert them to default?"
+msgstr "オプション値を削除してデフォルトに戻していいですか。"
+
+msgid "Options Deleted."
+msgstr "オプションを削除しました。"
+
+# ----- Q_and_A.html --------------------------------------------------
+msgid "New post on your blog."
+msgstr "ブログに新規投稿がありました。"
+
+msgid "Title: %s"
+msgstr "タイトル: %s"
+
+msgid "Author: %s"
+msgstr "投稿者: %s"
+
+msgid "[%1$s] New Post: \"%2$s\""
+msgstr "[%1$s] 新規投稿: \"%2$s\""
+
+msgid "You can see the post here:"
+msgstr "次の URL で投稿が見られます:"
+
+msgid "Edit it: %s"
+msgstr "編集する: %s"
+

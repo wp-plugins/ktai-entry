@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta name="robots" content="noindex,nofollow" />
+<title>Ktai Entry エラーメッセージ</title>
+<style type="text/css">
+h1 {text-align:center;}
+h2 {color:white; background: maroon;}
+h3 {width:50%; color: white; background: maroon;}
+h3 a {color:lightblue;}
+h4 {width:48%; border-bottom:dotted 1px maroon; border-left:solid 12px maroon; padding-left:3px;}
+dt {font-weight:bold; background: #ffcccc; margin-right:25%;}
+dd {margin-bottom:0.5em;}
+li {line-height:1.5em;}
+.navi {text-align:center;}
+table {border-top:1px solid black;border-left:1px solid black;border-collapse:collapse}
+table th {border:0 none;border-right: solid 1px black;border-bottom: solid 1px black;}
+table td {border:0 none;border-right: solid 1px black;border-bottom: solid 1px black; text-align:center}
+td.feature {text-align:left;}</style>
+</head>
+<body>
+<h1>Ktai Entry マニュアル</h1>
+<p class="navi">[ <a href="README.ja.html">はじめに</a> | <a href="Q_and_A.ja.html">よくある質問と答え</a> | <a href="ERRORS.ja.html">エラーメッセージ</a> ]</p>
+
+<p>Ktai Entry で、外部メールボックスの手動取り込みを行なったときのエラーや、ログ機構を有効にしたときに記録されるエラーメッセージの解説および、対応策を解説します。</p>
+
+<h2 id="errors">エラーメッセージ</h2>
+<p>外部メールボックスの手動取り込みを行なったときブラウザーに表示されるエラー、もしくは、メール着信で投稿スクリプトを起動させる仕組みの場合、差出人に返送されるエラーメールに記載されたエラー事由です。NN は数値、XXXX は英字の文字列です。</p>
+<dl>
+<dt id="invalid_structure">Invalid MIME structure: XXXXXXXX</dt>
+<dd>メールメッセージの解析に失敗したときに表示されます (XXXXXXXX は MIME デコードライブラリーが返したエラーメッセージ)。添付ファイル付きメールの形式が異常な場合などに発生します。たいていはメール送信側が RFC 違反のメールを作っている場合に発生しますが、Ktai Entry で利用している MIME デコードライブラリーのバグで解析不良の場合もあります。このエラーが発生したときは作者に相談してください。</dd>
+<dt id="invalid_recipent">Invalid recipient address.</dt>
+<dd>投稿受付アドレスを設定している場合、投稿メールの宛先が設定したアドレスと異なっているため不正なメールと判断したというエラーです。投稿メールの宛先を確認してください。もしくは、投稿受付アドレスのフィールドを空にしてください。</dd>
+<dt id="no_sender_address">No sender address found.</dt>
+<dd>投稿メールの差出人が空もしくは MAILER-DAEMON の場合のエラーです。通常の投稿メールではこのエラーは発生しません。おそらく、スパムやエラーメールが投稿受付アドレスに届いてしまっています。頻繁に発生する場合は、投稿用アドレスを変更してみてください。</dd>
+<dt id="sender_not_registered">Sender address is not registered: XXXXX@XXXXXXXX</dt>
+<dd>投稿メールの差出人アドレスが、あなたの WordPress ウェブログに登録されていません。<a href="README.ja.html#installation">設置方法</a>に従って、新規ユーザーを作成して、メールアドレスとして携帯電話等のメールアドレスを登録してください。</dd>
+<dt id="no_date">There is no Date: field.</dt>
+<dd>投稿メールに Date: フィールドがないというエラーです。通常の投稿メールではこのエラーは発生しません。おそらく、スパムメールが投稿受付アドレスに届いてしまっています。頻繁に発生する場合は、投稿用アドレスを変更してみてください。</dd>
+<dt id="not_allowed_post">You are not allowed to post.</dt>
+<dd>差出人メールアドレスに対応するユーザーの権限が低くて投稿が受け付けられないというエラーです。当該ユーザーに投稿させる場合は、最低でも「寄稿者」「作成者」権限を適用させてください (寄稿者の場合はレビュー待ち、作成者の場合はすぐ公開になります)。当該ユーザーに投稿させないときは、「投稿はできない」旨をユーザーに伝えてください。</dd>
+<dt id="post_specified_date">There is a post for specified date "XXXX-XX-XX XX:XX:XX".</dt>
+<dd>同じ投稿日時の投稿がすでに存在するため投稿できないというエラーです。DATE コマンドで日時指定している場合は、時刻指定をずらすか、日時として指定する画像を別のものにしてください。<br />
+DATE コマンドを使っていない場合は、おそらく、メールループが発生しています。メールサーバー管理者に、投稿メールの差出人アドレス、投稿先アドレス、投稿日時 (エラーメッセージに記載された日時) などを伝えて、メールキューの調査および削除を依頼してみてください。</dd>
+<dt id="couldnt_post">We couldn't post, for whatever reason.</dt>
+<dd>WordPress コアが投稿を受け付けませんでした。メールの題名 (件名、Subject) がない場合がほとんどです。題名をつけて投稿し直してください。</dd>
+<dt id="same_content">There is a post #NNN with the same content.</dt>
+<dd>同じ内容の投稿がすでに存在します。テスト投稿の場合は、単なる「テスト」という本文にせず、「テスト2」などと少しずつ内容を変化させてください。もしくは、端末の操作ミスで同じメールを送ってしまったか、何らかの不具合でメールループが発生しています。メールサーバー管理者に、投稿メールの差出人アドレス、投稿先アドレス、投稿日時 (エラーメッセージに記載された日時) などを伝えて、メールキューの調査および削除を依頼してみてください。</dd>
+<dt id="failed_updating_post">Failed updating the new post #NNN with NN image(s).</dt>
+<dd>写真つきメールの場合、添付写真を本文に挿入することができなかったというエラーです。本文のみは下書きとして保存されています。</dd>
+<dt id="too_short">The Message is too short.</dt>
+<dd>投稿メールが短かすぎるというエラーです。.qmail/.forward/.procmail から、inject.php へのデーター受け渡しがうまくいっていません。.qmail ファイル等の記述を見直してください。</dd>
+<dt id="malformed_syntax">Your request could not be understood by the server due to malformed syntax.<br />あなたのリクエストはサーバーに理解されませんでした。書式が正しくないためです。</dt>
+<dd>外部メールボックスの手動取り込みを行う URI が正しくない場合のエラーです。おそらく、悪意ある第三者による攻撃またはいたずらです。頻繁に発生する場合は、何らかのアクセス防御を行ってください。</dd>
+<dt id="pop3_not_valid">The POP3 config is not valid.<br />POP3 設定が正しくありません。</dt>
+<dd>POP3 設定が間違っていて、外部メールボックスにアクセスできなかったというエラーです。設定を見直してください。特に、パスワードや APOP 使用の有無はよく確認してください。</dd>
+<dt id="cant_delete_message">Can't delete message #NN: XXXXXXXXX<br />メッセージ #NN を削除できません</dt>
+<dd>外部メールサーバーから、投稿メールを削除できませんでした。XXXXXXXX はメールサーバーから返されたエラーそのものです。2回以上発生する場合は、外部メールサーバーの管理者に相談してみてください。</dd>
+</dl>
+
+<h2 id="logs">ログメッセージ</h2>
+<dl>
+<dt id="no_new_mail">There doesn't seem to be any new mail.<br />
+新着メールはないようです。</dt>
+<dd>外部メールボックスに新着メールがなかったという報告です。特にエラーではありません。</dd>
+<dt id="nn_messages">There is NN message(s)<br />NN 通のメッセージがあります。</dt>
+<dd>メールサーバーに溜っているメッセージ数です。</dd>
+<dt id="mission_complete">Mission complete, message "NN" deleted.<br />任務完了。メッセージ "NN" を削除しました。</dt>
+<dd>投稿処理が正常終了したという報告です。</dd>
+<dt id="invalid_date_command">Invalid DATE command: XXXXXXXX<br />不正な DATE コマンド</dt>
+<dd>DATE コマンドの書式が正しくありません。<a href="README.ja.html#postdate">DATE コマンドの説明</a>をよく読んでみてください。</dd>
+<dt id="gd_not_available">GD not available.<br />GD が使えません。</dt>
+<dd>利用しているサーバーの PHP に GD が組み込まれていません。このため、添付写真を扱うことができません。サーバー管理者に相談して GD を利用可能にしてもらってください。</dd>
+<dt id="failed_inserting_attachment">Failed inserting attachment for post #NNN: XXXXXXXX<br />投稿 #NNN に添付ファイルを追加できませんでした</dt>
+<dd>添付ファイルが不正な状態であったり、ユーザー権限が低いなど、何らかの理由で、添付ファイルを WordPress ウェブログに登録することができませんでした。</dd>
+<dt id="invalid_image_resource">Invalid image resource for file: XXXXXXXX<br />次のファイルで画像リソースを作れませんでした</dt>
+<dd>元画像が壊れているなど、何らかの理由で添付画像の処理ができませんでした。どの画像での同じエラーが発生する場合は、サーバー管理者に相談してみてください。</dd>
+<dt id="cant_create_file">Can't create a file: XXXXXXXX<br />ファイルを作れませんでした</dt>
+<dt id="cant_write_file">Can't write to file: XXXXXXXX<br />ファイルに書き込みできませんでした</dt>
+<dt id="cant_close_file">Can't close the file: XXXXXXXX<br />ファイルを閉じられませんでした</dt>
+<dt id="cant_chmod_file">Can't chmod the file: XXXXXXXX<br />ファイルのアクセス権を変更できませんでした:</dt>
+<dd>アップロードディレクトリーのファイル権限 (パーミッション) がないなどの理由で、ファイル処理に失敗しました。「メール着信により投稿スクリプトを起動する」(inject.php を利用する) 場合は、inject.php の所有者権限でアップロードディレクトリーに書き込みができる必要があります。</dd>
+<dt id="invalid_image_type">Invalid image type "XXXX" for file: XXXXXXXX<br />不正な画像タイプ "XXXX" が次のファイルにありました</dt>
+<dd>元画像が壊れているか、メールの MIME タイプが正しく設定されていません。通常の携帯メールでは、まず発生しません。PC からメール投稿している場合、画像ファイルの形式を確認してください。JPEG 画像なのに gif という拡張子だったりすると、このエラーになります。</dd>
+<dt id="cant_write_rotated_image">Can't write rotated image: XXXXXXXX<br />回転した画像を書き込めません</dt>
+<dd>アップロードディレクトリーのファイル権限 (パーミッション) がないなどの理由で、ファイル処理に失敗しました。「メール着信により投稿スクリプトを起動する」(inject.php を利用する) 場合は、inject.php の所有者権限でアップロードディレクトリーに書き込みができる必要があります。</dd>
+<dt id="exif_not_available">EXIF functions not available.<br />EXIF 関数が使えません。</dt>
+<dd>利用しているサーバーの PHP に EXIF 拡張が組み込まれていません。このため、添付写真の日時を読み取れません。サーバー管理者に相談して EXIF 拡張を利用可能にしてもらってください。</dd>
+</dl>
+<p>以上</p>
+</body>
+</html>
