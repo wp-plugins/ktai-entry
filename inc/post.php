@@ -971,7 +971,7 @@ private function postdate_from_image(&$post_data, $image_num, $post_name_assign)
 
 	// Read the date and time from EXIF
 	if (function_exists('exif_read_data')) {
-		$exif = exif_read_data($img[0], 'FILE');
+		$exif = exif_read_data($img[0]['file'], 'FILE');
 		if (isset($exif['DateTimeOriginal']) && ($timestamp = @strtotime($exif['DateTimeOriginal'])) > 0) {
 			$this->set_post_date($post_data, $timestamp, array_keys((array) $this->attachments), $image_num);
 			$this->debug_print(sprintf(__('Post date "%1$s" by EXIF of image: %2$s', 'ktai_entry_log'), $post_data['post_date'], $img[0]['name']));

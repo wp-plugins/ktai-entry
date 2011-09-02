@@ -118,7 +118,7 @@ public function connect() {
 public function retrieve($count) {
 	for ($i=1; $i <= $count; $i++) :
 		$lines = $this->pop3->get($i);
-		$contents = $this->post->parse(str_replace("\r\n", "\n", implode('', $lines)));
+		$contents = $this->post->parse(str_replace("\r\n", "\n", implode('', (array) $lines)));
 		if (is_ke_error($contents)) {
 			$message = sprintf(__('Error at #%1$d: %2$s', 'ktai_entry_log'), $i, $contents->getMessage());
 			do_action('ktai_retrieve_parse_error', $message, $contents);
