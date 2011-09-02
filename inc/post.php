@@ -973,7 +973,7 @@ private function postdate_from_image(&$post_data, $image_num, $post_name_assign)
 	if (function_exists('exif_read_data')) {
 		$exif = exif_read_data($img[0]['file'], 'FILE');
 		if (isset($exif['DateTimeOriginal']) && ($timestamp = @strtotime($exif['DateTimeOriginal'])) > 0) {
-			$this->set_post_date($post_data, $timestamp, array_keys((array) $this->attachments), $image_num);
+			$this->set_post_date($post_data, $timestamp, array_keys((array) $this->attachments), $image_num, $post_name_assign);
 			$this->debug_print(sprintf(__('Post date "%1$s" by EXIF of image: %2$s', 'ktai_entry_log'), $post_data['post_date'], $img[0]['name']));
 		}
 	} else {
@@ -991,7 +991,7 @@ private function postdate_from_image(&$post_data, $image_num, $post_name_assign)
 		$timestamp = mktime($t[4], $t[5], (isset($t[7]) ? $t[6] : 0), $t[2], $t[3], $t[1]);
 	}
 	if ($timestamp) {
-		$this->set_post_date($post_data, $timestamp, array_keys((array) $this->attachments), $image_num);
+		$this->set_post_date($post_data, $timestamp, array_keys((array) $this->attachments), $image_num, $post_name_assign);
 		$this->debug_print(sprintf(__('Post date "%1$s" by filename of image: %2$s', 'ktai_entry_log'), $post_data['post_date'], $img['name']));
 	}
 	return;
