@@ -43,11 +43,11 @@ class KtaiMailEncode {
  * @return	object  $this
  * @since 0.9.0
  */
-public static function factory() {
+public static function factory($base) {
 	if ( function_exists('mb_convert_encoding') ) {
-		return new KtaiMailEncode_mbstring();
+		return new KtaiMailEncode_mbstring($base);
 	} else { // assume having iconv extension
-		return new KtaiMailEncode_iconv();
+		return new KtaiMailEncode_iconv($base);
 	}
 }
 
@@ -56,9 +56,8 @@ public static function factory() {
  * @return	object  $this
  * @since 0.9.0
  */
-public function __construct() {
-	global $Ktai_Entry;
-	$this->base = $Ktai_Entry;
+public function __construct($base) {
+	$this->base = $base;
 	$this->blog_encoding = get_bloginfo('charset');
 }
 
@@ -182,7 +181,7 @@ public function get_charset($ctype) {
  * @param	object   $part
  * @return	object   $content
  */
-private function get_mime_parts($part) {
+public function get_mime_parts($part) {
 	$contents = new KtaiMailContent;
 	switch (strtolower($part->ctype_primary)) {
 		case 'multipart':
@@ -245,7 +244,7 @@ private function get_mime_parts($part) {
  */
 private function get_mime_text_part(&$contents, $part) {
 	$text = $part->body;
-	$encoding = $this-->get_charset($part->ctype_parameters);
+	$encoding = $this->get_charset($part->ctype_parameters);
 	if ( !$this->check($text, $encoding) ) {
 			$this->base->debug_print(sprintf(__('Invalid character found for %1$s encoding.', 'ktai_entry_log'),  $encoding));
 			$this->base->debug_print(sprintf(__('Skipped %1$s/%2$s part.', 'ktai_entry_log'), $part->ctype_primary, $part->ctype_secondary));
@@ -351,8 +350,8 @@ private function validate_extension($filename, $p_type, $s_type) {
 class KtaiMailEncode_mbstring extends KtaiMailEncode {
 	public static $detect_order = array('ASCII', 'JIS', 'UTF-8', 'SJIS', 'EUC-JP', 'SJIS-win');
 
-public function __construct() {
-	parent::__construct();
+public function __construct($base) {
+	parent::__construct($base);
 	$this->original_encoding = mb_internal_encoding();
 }
 
@@ -483,8 +482,8 @@ public function replace($pattern, $replacement, $target, $encoding = '', $option
 class KtaiMailEncode_iconv extends KtaiMailEncode {
 	public static $detect_order = array('US-ASCII', 'ISO-2022-JP', 'UTF-8', 'Shift_JIS', 'EUC-JP', 'CP932');
 
-public function __construct() {
-	parent::__construct();
+public function __construct($base) {
+	parent::__construct($base);
 	$this->original_encoding = $this->blog_encoding;
 }
 

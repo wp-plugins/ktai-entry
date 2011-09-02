@@ -38,12 +38,14 @@ class KtaiEntry_Retrieve extends KtaiEntry {
 
 // ==================================================
 public function __construct() {
-	if (isset($_SERVER['HTTP_HOST'])) {
-		if (isset($_GET['_wpnonce']) 
-		&& ! $this->verify_nonce($_GET['_wpnonce'], 'ktai-entry-retrieve')) {
-			$this->http_error(400, __('Your request could not be understood by the server due to malformed syntax.', 'ktai_entry_log'));
-			// exit;
-		} elseif (! $this->elapsed_interval()) {
+	if ( isset($_SERVER['HTTP_HOST']) ) {
+		if ( isset($_GET['_wpnonce']) ) {
+			if ( !$this->verify_nonce($_GET['_wpnonce'], 'ktai-entry-retrieve')) {
+				$this->http_error(400, __('Your request could not be understood by the server due to malformed syntax.', 'ktai_entry_log'));
+				// exit;
+			}
+			// Go to retireve process.
+		} elseif ( !$this->elapsed_interval() ) {
 			$this->display_as_html('Retrieval interval does not elapsed.', 'ktai_entry_log');
 			exit;
 		}
@@ -116,7 +118,7 @@ public function connect() {
 public function retrieve($count) {
 	for ($i=1; $i <= $count; $i++) :
 		$lines = $this->pop3->get($i);
-		$contents = $this->post->parse(str_replace("\r\n", "\n", implode('', $lines)));
+		$contents = $this->post->parse(str_replace("\r\n", "\n", implode('', (array) $lines)));
 		if (is_ke_error($contents)) {
 			$message = sprintf(__('Error at #%1$d: %2$s', 'ktai_entry_log'), $i, $contents->getMessage());
 			do_action('ktai_retrieve_parse_error', $message, $contents);

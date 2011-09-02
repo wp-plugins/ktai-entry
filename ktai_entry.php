@@ -2,7 +2,7 @@
 /*
 Plugin Name: Ktai Entry
 Plugin URI: http://wordpress.org/extend/plugins/ktai-entry/
-Version: 0.9.0
+Version: 0.9.0.1
 Description: Create a new post from a mail message sent by mobile phones.
 Author: IKEDA Yuriko
 Author URI: http://en.yuriko.net/
@@ -30,7 +30,7 @@ if ( defined('WP_INSTALLING') && WP_INSTALLING ) {
 	return;
 }
 // define('KTAI_LOGFILE', 'logs/error.log');
-define('KTAI_ENTRY_DEBUG', true);
+define('KTAI_ENTRY_DEBUG', false);
 define('KTAI_LOGFILE_PERM', 0000666);
 
 define('KTAI_POST_TEMPLATE', '<div class="photo {alignment}">{images}</div>
@@ -83,12 +83,14 @@ public function __construct() {
 		$this->http_error(403, "You don't have permission to access the URL on this server.");
 		// exit;
 	}	
+	add_action('wp-mail.php', array($this, 'kill_wpmail')); // after WP 2.9
+
 	$this->plugin_dir = basename(dirname(__FILE__));
 	$this->plugin_url = plugins_url($this->plugin_dir . '/');
 	$this->schedule = new KtaiEntry_Schedule($this);
 
 	require dirname(__FILE__) . '/' . self::INCLUDES_DIR . '/encode.php';
-	$this->encode = KtaiMailEncode::factory();
+	$this->encode = KtaiMailEncode::factory($this);
 
 	if (is_admin()) {
 		register_activation_hook(__FILE__, array($this, 'check_wp_load'));
@@ -100,13 +102,10 @@ public function __construct() {
 			add_action('deactivate_sitewide_plugin', array($this, 'stopped_sitewidely'));
 		}
 	}
-/*
 	if ( $this->get_option('ke_notify_publish') ) {
 		add_action('publish_phone', array($this, 'notify_publish'));
 	}
-*/
 	add_action('plugins_loaded', array($this, 'load_textdomain'));
-	add_action('wp-mail.php', array($this, 'kill_wpmail'));
 }
 
 /* ==================================================
