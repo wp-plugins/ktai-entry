@@ -136,6 +136,9 @@ To get support for this plugin, please contact below methods:
 
 == Changelog ==
 
+= 0.9.0.2 (2010-09-07) =
+* Fixed a issue that mobile pictograms are not recognized. (For version 0.9.0.x only)
+
 = 0.9.0.1 (2010-09-02) =
 * Fixed a issue on a mail with attached images. (For version 0.9.0 only)
 * Stopped debug mode. (Only version 0.9.0, debug mode is on by accident.)

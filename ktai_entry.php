@@ -2,7 +2,7 @@
 /*
 Plugin Name: Ktai Entry
 Plugin URI: http://wordpress.org/extend/plugins/ktai-entry/
-Version: 0.9.0.1
+Version: 0.9.0.2
 Description: Create a new post from a mail message sent by mobile phones.
 Author: IKEDA Yuriko
 Author URI: http://en.yuriko.net/
@@ -125,7 +125,7 @@ public function get($key) {
 public function load_textdomain() {
 	if (! $this->textdomain_loaded) {
 		load_plugin_textdomain('ktai_entry', false, $this->get('plugin_dir') . self::DOMAIN_PATH);
-//		load_plugin_textdomain('ktai_entry_log', false, $this->get('plugin_dir') . self::$domain_path);
+//		load_plugin_textdomain('ktai_entry_log', false, $this->get('plugin_dir') . self::DOMAIN_PATH);
 		$this->textdomain_loaded = true;
 	}
 }

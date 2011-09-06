@@ -515,6 +515,9 @@ private function validate_address($address) {
 private function select_operator($address) {
 	require_once dirname(__FILE__) . '/operators.php';
 	list($this->operator, $type) = KtaiEntry_Operator::factory($address, $this->type);
+	if (is_object($this->operator)) {
+		add_filter('ktai_checked_mime_text', array($this->operator, 'pickup_pictograms'), 10, 2);
+	}
 	$this->debug_print(sprintf(__('1 message from %1$s, Pictogram type: %2$s', 'ktai_entry_log'), $address, $type));
 	return;
 }
