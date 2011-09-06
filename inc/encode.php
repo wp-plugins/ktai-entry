@@ -245,6 +245,7 @@ public function get_mime_parts($part) {
 private function get_mime_text_part(&$contents, $part) {
 	$text = $part->body;
 	$encoding = $this->get_charset($part->ctype_parameters);
+	$text = apply_filters('ktai_raw_mime_text', $text, $encoding); // pickup pictograms for JIS
 	if ( !$this->check($text, $encoding) ) {
 			$this->base->debug_print(sprintf(__('Invalid character found for %1$s encoding.', 'ktai_entry_log'),  $encoding));
 			$this->base->debug_print(sprintf(__('Skipped %1$s/%2$s part.', 'ktai_entry_log'), $part->ctype_primary, $part->ctype_secondary));
@@ -254,7 +255,7 @@ private function get_mime_text_part(&$contents, $part) {
 		$encoding = self::$detect_order;
 	}
 	$this->base->debug_print(sprintf(__('Detect text/%1$s part encoding as "%2$s"', 'ktai_entry_log'), $part->ctype_secondary, $encoding));
-	$text = apply_filters('ktai_checked_mime_text', $text, $encoding); // pickup pictograms
+	$text = apply_filters('ktai_checked_mime_text', $text, $encoding); // pickup pictograms for SJIS
 	$text = $this->convert_from_mobile($text, $encoding);
 	switch (strtolower($part->ctype_secondary)) {
 		case 'x-pmaildx':

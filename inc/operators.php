@@ -11,53 +11,62 @@
 
 class KtaiEntry_Operator {
 	public $base; // needs public when called by hook
+	public $pictogram_type;
 
 /* ==================================================
- * @param	string   $address
- * @param	string   $method
- * @return	none
+ * @param	string   $sender
+ * @param	array    $recipients
+ * @return	object   $this
  */
-public static function factory($address, $method) {
-	$is_yahoo = ($method == 'pop' && preg_match('/pop\.mail\.yahoo\.co\.jp$/i', get_option('mailserver_url')));
-	if (preg_match('/@(ezweb\.ne|auone)\.jp$/i', $address)) {
-		$operator = new KtaiEntry_EZweb();
-		$type = 'KDDI';
-	} elseif (preg_match('/@((\w+\.)?pdx\.ne\.jp|willcom\.com)$/i', $address)) {
-		$operator = new KtaiEntry_WILLCOM();
-		$type = 'WILLCOM';
-	} elseif (preg_match('/@docomo\.ne\.jp$/i', $address)) {
-		if ($is_yahoo) {
-			$operator = new KtaiEntry_imode_ISO();
-			$type = 'DoCoMo (JIS)';
-		} else {
-			$operator = new KtaiEntry_imode_SJIS();
-			$type = 'DoCoMo';
+public static function factory($sender, $recipients) {
+	$operator = NULL;
+	$is_yahoojp = false;
+
+	foreach ( $recipients as $r) {
+		if ( is_email($r) && preg_match('/@(yahoo\.co|ybb\.ne)\.jp$/i', $r) ) {
+			$is_yahoojp = true;
+			break;
 		}
-	} elseif (preg_match('/@emnet\.ne\.jp$/i', $address)) {
-		$operator = new KtaiEntry_EMNet();
-		$type = 'EMOBILE';
-	} elseif (preg_match('/@((softbank|disney|[dhrtcknsq]\.vodafone)\.ne|i\.softbank)\.jp$/i', $address)) {
-		if ($is_yahoo) {
-			$operator = new KtaiEntry_SoftBank_ISO();
-			$type = 'SoftBank/Disney (JIS)';
-		} else {
-			$operator = new KtaiEntry_SoftBank_SJIS();
-			$type = 'SoftBank/Disney';
-		}
-	} else {
-		$operator = NULL;
-		$type = __('(N/A)', 'ktai_entry_log');
 	}
-	return array($operator, $type);
+	if ( is_email($sender) ) {
+		if (preg_match('/@(ezweb\.ne|auone)\.jp$/i', $sender)) {
+			$operator = new KtaiEntry_EZweb();
+			add_filter('ktai_checked_mime_text', array($operator, 'pickup_pictograms'), 10, 2);
+		} elseif (preg_match('/@((\w+\.)?pdx\.ne\.jp|willcom\.com)$/i', $sender)) {
+			$operator = new KtaiEntry_WILLCOM();
+			add_filter('ktai_raw_mime_text', array($operator, 'pickup_pictograms'), 10, 2);
+		} elseif (preg_match('/@docomo\.ne\.jp$/i', $sender)) {
+			if ($is_yahoojp) {
+				$operator = new KtaiEntry_imode_ISO();
+				add_filter('ktai_raw_mime_text', array($operator, 'pickup_pictograms'), 10, 2);
+			} else {
+				$operator = new KtaiEntry_imode_SJIS();
+				add_filter('ktai_checked_mime_text', array($operator, 'pickup_pictograms'), 10, 2);
+			}
+		} elseif (preg_match('/@emnet\.ne\.jp$/i', $sender)) {
+			$operator = new KtaiEntry_EMNet();
+			add_filter('ktai_checked_mime_text', array($operator, 'pickup_pictograms'), 10, 2);
+		} elseif (preg_match('/@((softbank|disney|[dhrtcknsq]\.vodafone)\.ne|i\.softbank)\.jp$/i', $sender)) {
+			if ($is_yahoojp) {
+				$operator = new KtaiEntry_SoftBank_ISO();
+				add_filter('ktai_raw_mime_text', array($operator, 'pickup_pictograms'), 10, 2);
+			} else {
+				$operator = new KtaiEntry_SoftBank_SJIS();
+				add_filter('ktai_checked_mime_text', array($operator, 'pickup_pictograms'), 10, 2);
+			}
+		}
+	}
+	return $operator;
 }
 
 /* ==================================================
- * @param	object   $mailpost
+ * @param	none
  * @return	none
  */
 public function __construct() {
 	global $Ktai_Entry;
 	$this->base = $Ktai_Entry;
+	$this->pictogram_type = __('(N/A)', 'ktai_entry_log');
 	return;
 }
 
@@ -793,6 +802,15 @@ class KtaiEntry_EZweb extends KtaiEntry_Operator {
 	);
 
 /* ==================================================
+ * @param	none
+ * @return	none
+ */
+public function __construct() {
+	parent::__construct();
+	$this->pictogram_type = 'KDDI';
+}
+
+/* ==================================================
  * @param	string   $buffer
  * @param	string   $encoding
  * @return	string   $buffer
@@ -1066,6 +1084,15 @@ class KtaiEntry_imode_SJIS extends KtaiEntry_Operator {
 	);
 
 /* ==================================================
+ * @param	none
+ * @return	none
+ */
+public function __construct() {
+	parent::__construct();
+	$this->pictogram_type = 'DoCoMo';
+}
+
+/* ==================================================
  * @param	string   $buffer
  * @param	string   $encoding
  * @return	string   $buffer
@@ -1254,6 +1281,15 @@ class KtaiEntry_WILLCOM extends KtaiEntry_imode_SJIS {
 	);
 
 /* ==================================================
+ * @param	none
+ * @return	none
+ */
+public function __construct() {
+	parent::__construct();
+	$this->pictogram_type = 'WILLCOM';
+}
+
+/* ==================================================
  * @param	string   $buffer
  * @param	string   $encoding
  * @return	string   $buffer
@@ -1272,6 +1308,15 @@ public function pickup_pictograms($buffer, $encoding) {
    ================================================== */
 
 class KtaiEntry_EMNet extends KtaiEntry_imode_SJIS {
+
+/* ==================================================
+ * @param	none
+ * @return	none
+ */
+public function __construct() {
+	parent::__construct();
+	$this->pictogram_type = 'EMOBILE';
+}
 
 // ===== End of class ====================
 }
@@ -1544,6 +1589,15 @@ class KtaiEntry_imode_ISO extends KtaiEntry_Operator {
  */
 public function pickup_pictograms($buffer, $encoding) {
 	return $this->pickup_iso_pictograms($buffer, $encoding, self::$pictograms_iso);
+}
+
+/* ==================================================
+ * @param	none
+ * @return	none
+ */
+public function __construct() {
+	parent::__construct();
+	$this->pictogram_type = 'DoCoMo (JIS)';
 }
 
 // ===== End of class ====================
@@ -2046,6 +2100,15 @@ class KtaiEntry_SoftBank_ISO extends KtaiEntry_Operator {
 		"\x7d\x76" => 'se53e', // Vodafone 5
 */
 	);
+
+/* ==================================================
+ * @param	none
+ * @return	none
+ */
+public function __construct() {
+	parent::__construct();
+	$this->pictogram_type = 'SoftBank/Disney (JIS)';
+}
 
 /* ==================================================
  * @param	string   $buffer
@@ -2555,6 +2618,15 @@ class KtaiEntry_SoftBank_SJIS extends KtaiEntry_Operator {
 		"\xfb\xde" => 'se53e', // Vodafone 5
 */
 	);
+/* ==================================================
+ * @param	none
+ * @return	none
+ */
+public function __construct() {
+	parent::__construct();
+	$this->pictogram_type = 'SoftBank/Disney';
+}
+
 /* ==================================================
  * @param	string   $buffer
  * @param	string   $encoding

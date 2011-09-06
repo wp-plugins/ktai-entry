@@ -136,6 +136,9 @@ To get support for this plugin, please contact below methods:
 
 == Changelog ==
 
+= 0.9.1.1 (2010-09-07) =
+* Fixed an issue of skipping the content with Yahoo! mail.
+
 = 0.9.1 (2010-09-07) =
 * When changing the post date time into the date time of the specified attached file, the plugin recognizes a date time format `yymmdd_hhiiss` of the image filename.
 * Replace the attachment filename to `Ymd_His.jpg` format if the original name is 'image.jpg' or 'photo.jpg'

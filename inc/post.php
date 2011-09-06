@@ -262,15 +262,15 @@ public function parse($input) {
 		if (PEAR::isError($structure)) {
 			throw new KE_Error(sprintf('Invalid MIME structure: %s', $structure->getMessage()), self::NO_SENDER_ADDRESS);
 		}
+		$recipients = $this->read_recipients($structure);
 		$posting_addr = $this->base->get_option('ke_posting_addr');
-		if (is_email($posting_addr)) {
-			$recipients = $this->read_recipients($structure);
-			if (! in_array($posting_addr, $recipients)) {
+		if ( is_email($posting_addr) ) {
+			if ( !in_array($posting_addr, $recipients) ) {
 				throw new KE_Error('Invalid recipient address.', self::INVALID_RECIPIENT_ADDRESS);
 			}
 		}
 		$from = $this->read_sender($structure);
-		if (! $from || preg_match('/^MAILER-DAEMON@/i', $from)) {
+		if ( !$from || preg_match('/^MAILER-DAEMON@/i', $from) ) {
 			throw new KE_Error('No sender address found.', self::NO_SENDER_ADDRESS);
 		}
 		$post_author = $this->validate_address($from);
@@ -283,7 +283,7 @@ public function parse($input) {
 		} elseif ($this->check_duplication_by_time($post_time_gmt)) {
 			throw new KE_Error(sprintf('The mail at "%s" was already posted.', $structure->headers['date']), self::ALREADY_POSTED);
 		}
-		$this->select_operator($from);
+		$this->select_operator($from, $recipients);
 		$this->contents = $this->base->encode->get_mime_parts($structure);
 
 		$this->base->debug_print(sprintf(__('Text %1$d bytes, Attachment %2$d part(s)', 'ktai_entry_log'), strlen($this->contents->text), count($this->contents->images)));
@@ -346,7 +346,7 @@ public function insert() {
 		$ping_status    = $post->ping_status;
 		$post_content   = apply_filters('phone_content', $this->contents->text);
 		$post_data = compact('post_title', 'post_name', 'post_date', 'post_date_gmt', 'post_author', 'post_category', 'tags_input', 'post_status', 'comment_status', 'ping_status', 'post_content');
-		if ($post_data['post_status'] == 'publish') {
+		if ( $post_data['post_status'] == 'publish' && strlen($post_data['post_content']) >= 1 ) {
 			$dup_post = $this->check_duplication_by_content($post_data['post_content']);
 			if ($dup_post) {
 				throw new KE_Error(sprintf('There is a post #%d with the same content.', $dup_post), self::ALREADY_POSTED);
@@ -510,16 +510,14 @@ private function validate_address($address) {
 }
 
 /* ==================================================
- * @param	string   $address
+ * @param	string   $sender
+ * @param	array    $recipients
  * @return	none
  */
-private function select_operator($address) {
+private function select_operator($sender, $recipients) {
 	require_once dirname(__FILE__) . '/operators.php';
-	list($this->operator, $type) = KtaiEntry_Operator::factory($address, $this->type);
-	if (is_object($this->operator)) {
-		add_filter('ktai_checked_mime_text', array($this->operator, 'pickup_pictograms'), 10, 2);
-	}
-	$this->base->debug_print(sprintf(__('1 message from %1$s, Pictogram type: %2$s', 'ktai_entry_log'), $address, $type));
+	$this->operator = KtaiEntry_Operator::factory($sender, $recipients);
+	$this->base->debug_print(sprintf(__('1 message from %1$s, Pictogram type: %2$s', 'ktai_entry_log'), $sender, $this->operator->pictogram_type));
 	return;
 }
 
