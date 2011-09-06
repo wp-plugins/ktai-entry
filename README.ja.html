@@ -576,9 +576,12 @@ Ktai Entry のメソッド notofy_publish() で送信される通知メールの
 <h2 id="history">改版履歴</h2>
 
 <dl class="itemize">
-<dt id="ver091">ver 0.9.0.2 (2011-09-07)</dt>
+<dt id="ver091">ver 0.9.1 (2011-09-07)</dt>
 <dd><ul>
+  <li><code>yymmdd_hhiiss</code> 形式の日時ファイル名を認識するようにしました。</li>
+  <li>添付ファイルの元の名前が「image.jpg」「photo.jpg」「画像.jpg」「写真.jpg」の場合、<code>Ymd_His.jpg</code>形式の名前に置き換えるようにしました。</li>
   <li>絵文字が認識されない不具合を修正しました。(ver 0.9.0.x のみ対象)</li>
+  <li>Ktai Entry 設定パネルで投稿を通知する設定が保存されない不具合を修正しました。</li>
 </ul></dd>
 <dt id="ver0901">ver 0.9.0.1 (2011-09-02)</dt>
 <dd><ul>

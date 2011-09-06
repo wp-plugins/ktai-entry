@@ -89,12 +89,12 @@ public function connect() {
 
 	$format = $this->return_css ? 'text' : 'html';
 	$this->post = new KtaiEntry_Post('pop', $format);
-	$this->pop3 = new KE_POP3();
-	$this->pop3->ALLOWAPOP = $this->post->get_option('ke_use_apop');
+	$this->pop3 = new KtaiEntry_POP3();
+	$this->pop3->ALLOWAPOP = $this->get_option('ke_use_apop');
 	if (! $this->pop3->connect($server_url, $server_port)) {
 		$this->http_error(502, $this->pop3->ERROR);
 	}
-	if ($this->post->get_option('ke_use_apop')) {
+	if ($this->get_option('ke_use_apop')) {
 		$count = $this->pop3->apop($server_login, $server_pass);
 	} else {
 		$count = $this->pop3->login($server_login, $server_pass);

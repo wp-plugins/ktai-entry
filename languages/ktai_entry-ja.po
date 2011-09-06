@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.9.0\n"
+"Project-Id-Version: 0.9.1\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2010-01-07 04:16+0900\n"
+"PO-Revision-Date: 2011-09-06 21:31+0900\n"
 "Last-Translator: IKEDA Yuriko <yuriko-poedit@yuriko.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -156,3 +156,9 @@ msgstr "オプション値を削除してデフォルトに戻す &raquo;"
 msgid "Options Deleted."
 msgstr "オプションを削除しました。"
 
+# ----- inc/post.php --------------------------------------------------
+msgid "image"
+msgstr "画像"
+
+msgid "photo"
+msgstr "写真"

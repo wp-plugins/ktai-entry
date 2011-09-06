@@ -17,7 +17,7 @@
  * $Id: class-pop3.php 6440 2007-12-20 22:28:54Z westi $
  */
 
-class KE_POP3 {
+class KtaiEntry_POP3 {
     var $ERROR      = '';       //  Error string.
 
     var $TIMEOUT    = 60;       //  Default timeout before giving up on a

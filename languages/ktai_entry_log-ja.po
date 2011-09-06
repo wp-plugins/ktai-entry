@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.9.0\n"
+"Project-Id-Version: 0.9.1\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2010-01-27 20:23+0900\n"
+"PO-Revision-Date: 2011-09-06 21:49+0900\n"
 "Last-Translator: IKEDA Yuriko <yuriko-poedit@yuriko.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -87,24 +87,6 @@ msgstr "(不明)"
 msgid "1 message from %1$s, Pictogram type: %2$s"
 msgstr "1 通のメッセージが %1$s から届きました。絵文字形式: %2$s"
 
-msgid "Detect %1$s encoding as \"%2$s\""
-msgstr "%1$s のエンコーディングを \"%2$s\" と検出しました。"
-
-msgid "Invalid character found for %1$s encoding."
-msgstr "%1$s エンコーディングに対して不正な文字がありました。"
-
-msgid "Skipped %1$s/%2$s part."
-msgstr "%1$s/%2$s パートをスキップしました。"
-
-msgid "Detect text/%1$s part encoding as \"%2$s\""
-msgstr "text/%1$s パートのエンコーディングを \"%2$s\" と検出しました。"
-
-msgid "Found %1$s/%2$s part with filename: %3$s"
-msgstr "%1$s/%2$s パートを見つけました。ファイル名: %3$s"
-
-msgid "Invalid filename \"%1$s\" for mime type \"%2$s/%3$s\""
-msgstr "MIME タイプ \"%2$s/%3$s\" で \"%1$s\" は不正なファイル名です。"
-
 msgid "Category: %s"
 msgstr "カテゴリー: %s"
 
@@ -153,6 +135,9 @@ msgstr "投稿 #%1$d に添付ファイルを追加できませんでした: %2$
 msgid "Inserted attachment: #%1$d for post #%2$d"
 msgstr "投稿 #%2$d に添付ファイルを追加しました: #%1$d"
 
+msgid "Replaced the filename into %s"
+msgstr "ファイル名を次に変更しました: %s"
+
 msgid "Invalid image resource for file: %s"
 msgstr "次のファイルで画像リソースを作れませんでした: %s"
 
@@ -188,4 +173,30 @@ msgstr "投稿日時 \"%1$s\" を次の画像の EXIF から読み出しまし�
 
 msgid "Post date \"%1$s\" by the filename of image: %2$s"
 msgstr "投稿日時 \"%1$s\" を次の画像のファイル名から読み出しました: %2$s"
+
+# ----- encode.php --------------------------------------------------
+msgid "Detect %1$s encoding as \"%2$s\""
+msgstr "%1$s のエンコーディングを \"%2$s\" と検出しました。"
+
+msgid "Invalid character found for %1$s encoding."
+msgstr "%1$s エンコーディングに対して不正な文字がありました。"
+
+msgid "Skipped %1$s/%2$s part."
+msgstr "%1$s/%2$s パートをスキップしました。"
+
+msgid "Detect text/%1$s part encoding as \"%2$s\""
+msgstr "text/%1$s パートのエンコーディングを \"%2$s\" と検出しました。"
+
+msgid "Found %1$s/%2$s part with filename: %3$s"
+msgstr "%1$s/%2$s パートを見つけました。ファイル名: %3$s"
+
+msgid "Invalid filename \"%1$s\" for mime type \"%2$s/%3$s\""
+msgstr "MIME タイプ \"%2$s/%3$s\" で \"%1$s\" は不正なファイル名です。"
+
+# ----- operators.php --------------------------------------------------
+msgid "Pictogram encoding is ISO-2022-JP."
+msgstr "絵文字のエンコーディングは ISO-2022-JP です。"
+
+msgid "Pictogram encoding is Shift_JIS."
+msgstr "絵文字のエンコーディングは Shift_JIS です。"
 
