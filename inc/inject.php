@@ -74,14 +74,14 @@ if (isset($_ENV['SENDER'])) {
 }
 $Ktai_Entry->debug_print(sprintf(__("***************************\n" . 'Received a %1$d-byte-message from %2$s', 'ktai_entry'), strlen($message), $sender));
 
-$post = new KtaiEntry_Post('mta', NULL);
-$result = $post->parse($message);
+$mailpost = new KtaiEntry_Post('mta', NULL);
+$result = $mailpost->parse($message);
 if (is_ke_error($result)) {
 	do_action('ktai_inject_parse_error', $result);
 	ke_inject_error($result);
 	// exit;
 }
-$result = $post->insert();
+$result = $mailpost->insert();
 if (is_ke_error($result)) {
 	do_action('ktai_inject_insert_error', $result);
 	ke_inject_error($result);

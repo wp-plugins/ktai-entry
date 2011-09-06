@@ -16,13 +16,15 @@ define('KTAI_SET_TAGS',            'TAG:');
 define('KTAI_ROTATE_IMAGE',        'ROT:');
 define('KTAI_DELIM_STR',           '-- ');
 define('KTAI_DEFAULT_POSTNAME',    'His');
+define('KTAI_DEFAULT_FILENAME',    'Ymd_His');
 define('KTAI_INLINE_IMAGE_CLASS',  'decoration-image');
 
 /* ==================================================
  *   KtaiEntry_Post class
    ================================================== */
 
-class KtaiEntry_Post extends KtaiEntry {
+class KtaiEntry_Post {
+	private $base;
 	private $type;
 	private $alignment_classes;
 	private $operator;
@@ -47,8 +49,7 @@ class KtaiEntry_Post extends KtaiEntry {
  */
 public function __construct ($type, $format = 'html') {
 	global $Ktai_Entry;
-	$this->encode = $Ktai_Entry->encode; // member of parent class
-	$this->display_format = $format; // member of parent class
+	$this->base = $Ktai_Entry;
 	$this->type = $type;
 	$this->alignment_classes = array(
 		'none'   => 'alignnone',
@@ -261,7 +262,7 @@ public function parse($input) {
 		if (PEAR::isError($structure)) {
 			throw new KE_Error(sprintf('Invalid MIME structure: %s', $structure->getMessage()), self::NO_SENDER_ADDRESS);
 		}
-		$posting_addr = $this->get_option('ke_posting_addr');
+		$posting_addr = $this->base->get_option('ke_posting_addr');
 		if (is_email($posting_addr)) {
 			$recipients = $this->read_recipients($structure);
 			if (! in_array($posting_addr, $recipients)) {
@@ -283,15 +284,15 @@ public function parse($input) {
 			throw new KE_Error(sprintf('The mail at "%s" was already posted.', $structure->headers['date']), self::ALREADY_POSTED);
 		}
 		$this->select_operator($from);
-		$this->contents = $this->encode->get_mime_parts($structure);
+		$this->contents = $this->base->encode->get_mime_parts($structure);
 
-		$this->debug_print(sprintf(__('Text %1$d bytes, Attachment %2$d part(s)', 'ktai_entry_log'), strlen($this->contents->text), count($this->contents->images)));
+		$this->base->debug_print(sprintf(__('Text %1$d bytes, Attachment %2$d part(s)', 'ktai_entry_log'), strlen($this->contents->text), count($this->contents->images)));
 		$this->contents->from            = $from;
 		$this->contents->post_author     = $post_author;
 		$this->contents->post_time_gmt   = $post_time_gmt;
 		$post_title = xmlrpc_getposttitle($this->contents->text);
 		if (! $post_title) {
-			$subject = $this->encode->decode_header($structure->headers['subject'], $structure->ctype_parameters, 'subject');
+			$subject = $this->base->encode->decode_header($structure->headers['subject'], $structure->ctype_parameters, 'subject');
 			$post_title = trim(str_replace(get_option('subjectprefix'), '', $subject));
 		}
 		$this->contents->post_title = $post_title;
@@ -360,7 +361,7 @@ public function insert() {
 			$log .= __('+-- Content -------------------', 'ktai_entry_log') . "\n";			
 			$log .= preg_replace('/^/m', '|', $post_data['post_content']);
 			$log .= "\n+------------------------------";
-			$this->debug_print($log);
+			$this->base->debug_print($log);
 		}
 	
 		$post_data_quoted = add_magic_quotes($post_data);
@@ -369,10 +370,10 @@ public function insert() {
 			throw new KE_Error("We couldn't post, for whatever reason.", self::COULDNT_POST);
 		}
 		$post_data['ID'] = $post_ID;
-		$this->debug_print(sprintf(__('Inserted a post with ID: %1$d, status: %2$s', 'ktai_entry_log'), $post_ID, $post_status));
+		$this->base->debug_print(sprintf(__('Inserted a post with ID: %1$d, status: %2$s', 'ktai_entry_log'), $post_ID, $post_status));
 
 		if (count($this->contents->images)) {
-			$this->attachments = $this->upload_images($rotations, $post_ID);
+			$this->attachments = $this->upload_images($rotations, $post_ID, $post_time);
 			$post_data['post_status'] = $status;
 			if ($this->attachments) {
 				if ($image_num) {
@@ -389,7 +390,7 @@ public function insert() {
 					$log =    "+-- Content w/images ----------\n";			
 					$log .= preg_replace('/^/m', '|', $post_data['post_content']);
 					$log .= "\n+------------------------------";
-					$this->debug_print($log);
+					$this->base->debug_print($log);
 				}
 			}
 			$post_data_quoted = add_magic_quotes($post_data);
@@ -397,7 +398,7 @@ public function insert() {
 			if (! $result || is_wp_error($result)) {
 				throw new KE_Error(sprintf('Failed updating the new post #%1$d with %2$d image(s).', $post_data['ID'], count($this->attachments)), self::FAILED_UPDATE_POST);
 			}
-			$this->debug_print(sprintf(__('Updated the new post to status "%1$s" with %2$d image(s).', 'ktai_entry_log'),  $status, count($this->attachments)));
+			$this->base->debug_print(sprintf(__('Updated the new post to status "%1$s" with %2$d image(s).', 'ktai_entry_log'),  $status, count($this->attachments)));
 		}
 
 		if ($post_data['post_status'] == 'publish') {
@@ -515,7 +516,10 @@ private function validate_address($address) {
 private function select_operator($address) {
 	require_once dirname(__FILE__) . '/operators.php';
 	list($this->operator, $type) = KtaiEntry_Operator::factory($address, $this->type);
-	$this->debug_print(sprintf(__('1 message from %1$s, Pictogram type: %2$s', 'ktai_entry_log'), $address, $type));
+	if (is_object($this->operator)) {
+		add_filter('ktai_checked_mime_text', array($this->operator, 'pickup_pictograms'), 10, 2);
+	}
+	$this->base->debug_print(sprintf(__('1 message from %1$s, Pictogram type: %2$s', 'ktai_entry_log'), $address, $type));
 	return;
 }
 
@@ -568,7 +572,7 @@ private function decide_category() {
 		$categories[] = get_option('default_email_category');
 	}
 	$categories = apply_filters('ktai_post_category', $categories);
-	$this->debug_print(sprintf(__('Category: %s', 'ktai_entry_log'), implode(', ', array_map('get_catname', $categories))));
+	$this->base->debug_print(sprintf(__('Category: %s', 'ktai_entry_log'), implode(', ', array_map('get_catname', $categories))));
 	return $categories;
 }
 
@@ -595,9 +599,9 @@ private function cat_name2id($cat_names) {
 		}
 	}
 	if (count($categories)) {
-		$this->debug_print(sprintf(__('Assign cats: "%1$s" -> %2$s', 'ktai_entry_log'), $cat_names, implode(',',$categories)));
+		$this->base->debug_print(sprintf(__('Assign cats: "%1$s" -> %2$s', 'ktai_entry_log'), $cat_names, implode(',',$categories)));
 	} else {
-		$this->debug_print(sprintf(__('No categories found from: "%s"', 'ktai_entry_log'), $cat_names));
+		$this->base->debug_print(sprintf(__('No categories found from: "%s"', 'ktai_entry_log'), $cat_names));
 	}
 	return $categories;
 }
@@ -612,7 +616,7 @@ private function decide_keywords() {
 		$keywords = trim($k[1]);
 		$this->contents->text = trim(preg_replace('/^' . preg_quote($k[0], '/') . '[ \t\r]*(\n|\z)/m', '', $this->contents->text, 1));
 		$keywords = apply_filters('ktai_post_keywords', $keywords);
-		$this->debug_print(sprintf(__('Tags: "%s"', 'ktai_entry_log'), $keywords));
+		$this->base->debug_print(sprintf(__('Tags: "%s"', 'ktai_entry_log'), $keywords));
 	}
 	return $keywords;
 }
@@ -631,7 +635,7 @@ private function decide_rotations() {
 	$rotations = $this->parse_rotation($rot_direction, count($this->contents->images));
 	$rotations = apply_filters('ktai_image_rotate', $rotations, $rot_direction, $this->contents->images);
 	if (isset($rotations) && count($rotations)) {
-		$this->debug_print(sprintf(__('Rotation: %s', 'ktai_entry_log'), implode(',', $rotations)));
+		$this->base->debug_print(sprintf(__('Rotation: %s', 'ktai_entry_log'), implode(',', $rotations)));
 	}
 	return $rotations;
 }
@@ -678,7 +682,7 @@ private function decide_postname() {
 	}
 	$post_name = apply_filters('ktai_post_name', $post_name, $this->contents);
 	if ($post_name) {
-		$this->debug_print(sprintf(__('Post slug: "%s"', 'ktai_entry_log'), $post_name));
+		$this->base->debug_print(sprintf(__('Post slug: "%s"', 'ktai_entry_log'), $post_name));
 	}
 	return $post_name;
 }
@@ -702,17 +706,17 @@ private function decide_postdate() {
 		if (is_numeric($date_string)) {
 			$image_num = intval($date_string);
 			if ($image_num > 0 && $image_num <= count($this->contents->images)) {
-				$this->debug_print(sprintf(__('Decide post date by image #%d', 'ktai_entry_log'), $image_num));
+				$this->base->debug_print(sprintf(__('Decide post date by image #%d', 'ktai_entry_log'), $image_num));
 			} else {
 				$image_num = NULL;
 			}
 		} else {
 			$post_time_gmt = @strtotime($date_string);
 			if ($post_time_gmt >= 86400) {
-				$this->debug_print(sprintf(__('Post date: "%s"', 'ktai_entry_log'), gmdate('Y-m-d H:i:s', $post_time_gmt)));
+				$this->base->debug_print(sprintf(__('Post date: "%s"', 'ktai_entry_log'), gmdate('Y-m-d H:i:s', $post_time_gmt)));
 			} else {
 				$post_time_gmt = NULL;
-				$this->debug_print(sprintf(__('Invalid DATE command: "%s"', 'ktai_entry_log'), $date_string));
+				$this->base->debug_print(sprintf(__('Invalid DATE command: "%s"', 'ktai_entry_log'), $date_string));
 			}
 		}
 	}
@@ -749,7 +753,7 @@ private function decide_status() {
 		$this->contents->text = trim(preg_replace('/^' . preg_quote($s[0]) . '[ \t\r]*(\n|\z)/m', '', $this->contents->text, 1));
 		$status = ($status == 'publish') ? 'pending' : $status;
 	}
-	$this->debug_print(sprintf(__('Status: %s', 'ktai_entry_log'), $status ? $status : __('(N/A)', 'ktai_entry_log')));
+	$this->base->debug_print(sprintf(__('Status: %s', 'ktai_entry_log'), $status ? $status : __('(N/A)', 'ktai_entry_log')));
 	return $status;
 }
 
@@ -763,7 +767,7 @@ private function chop_signature() {
 		$sig_match = strripos($text, "\n" . KTAI_DELIM_STR);
 		if ($sig_match > 0) {
 			$text = substr($text, 0, $sig_match);
-			$this->debug_print(sprintf(__('Signature chopped at byte position: %d', 'ktai_entry_log'), $sig_match));
+			$this->base->debug_print(sprintf(__('Signature chopped at byte position: %d', 'ktai_entry_log'), $sig_match));
 		}
 		$this->contents->text = $text;
 	}
@@ -773,10 +777,11 @@ private function chop_signature() {
 /* ==================================================
  * @param	array    $rotations
  * @param	int      $post_id
+ * @param	int      $post_time
  * @return	array    $attachments
  * based on wp_handle_upload() at wp-admin/includes/file.php of WP 2.5
  */
-private function upload_images($rotations, $post_id = 0) {
+private function upload_images($rotations, $post_id = 0, $post_time) {
 	if (count($this->contents->images) < 1) {
 		return array();
 	}
@@ -790,9 +795,9 @@ private function upload_images($rotations, $post_id = 0) {
 			$this->log_error(@$uploads['error']);
 			return array();
 		}
-		$filename = $this->unique_filename($uploads['path'], $img['name']);
+		$filename = $this->unique_filename($uploads['path'], $img['name'], $post_time);
 		$new_file = $uploads['path'] . '/' . $filename;
-		$this->debug_print(sprintf(__('Saving file: %s', 'ktai_entry_log'), $new_file));
+		$this->base->debug_print(sprintf(__('Saving file: %s', 'ktai_entry_log'), $new_file));
 		$result = $this->save_image($new_file, $img['s_type'], $img['body'], @$rotations[$count]);
 		if (is_ke_error($result)) {
 			$this->log_error($result->getMessage());
@@ -833,7 +838,7 @@ private function upload_images($rotations, $post_id = 0) {
 			$this->log_error(sprintf(__('Failed inserting attachment for post # %1$d: %2$s', 'ktai_entry_log'), $post_id,  $file));
 		} else {
 			wp_update_attachment_metadata($id, wp_generate_attachment_metadata($id, $file));
-			$this->debug_print(sprintf(__('Inserted attachment: #%1$d for post #%2$d', 'ktai_entry_log'), $id, $post_id));
+			$this->base->debug_print(sprintf(__('Inserted attachment: #%1$d for post #%2$d', 'ktai_entry_log'), $id, $post_id));
 			$attachments[$id] = array(
 				'file' => $file,
 				'cid'  => $img['cid'],
@@ -847,26 +852,37 @@ private function upload_images($rotations, $post_id = 0) {
 
 /* ==================================================
  * @param	string   $dir
- * @param	string   $filename
+ * @param	string   $filepath
  * @param	string   $new_file
  */
 // If $file is exists, change filename to $file_2, $file_3, ...
-private function unique_filename($dir, $filename) {
+private function unique_filename($dir, $filename, $post_time) {
 	$parts = pathinfo($filename);
 	$ext = $parts['extension'];
-	$basename = preg_replace("/\.{$ext}\$/", '', $parts['basename']);
-	$name = preg_replace(
-		array('/ /', '/[^-_~+a-zA-Z0-9]/'),
-		array( '_' , ''), 
-		$basename);
-	if (! preg_match('/[0-9a-zA-Z]/', $name)) {
-		$name = md5($basename);
+	if ( isset($parts['filename']) ) { // PHP 5.2 and later
+		$name = $parts['filename'];
+	} else {
+		$name = preg_replace('/\.' . preg_quote($ext, '/') . '$/', '', $parts['basename']);
+	}
+	if ( $name == 'image' || $name == 'photo' 
+	  || $name == __('image', 'ktai_entry') || $name == __('photo', 'ktai_entry') ) {
+		$new_name = gmdate(KTAI_DEFAULT_FILENAME, $post_time);
+		$this->base->debug_print(sprintf(__('Replaced the filename into %s', 'ktai_entry_log'), $name));
+	} else {
+		$new_name = preg_replace(
+			array('/ /', '/[^-_~+a-zA-Z0-9]/'),
+			array( '_' , ''), 
+			$name);
+		if ( !preg_match('/[0-9a-zA-Z]/', $new_name) ) {
+			$new_name = md5($name);
+			$this->base->debug_print(sprintf(__('Replaced the filename into %s', 'ktai_entry_log'), $new_name));
+		}
 	}
 	$count = '';
-	while (file_exists("$dir/$name$count.$ext")) {
+	while (file_exists("$dir/$new_name$count.$ext")) {
 		$count = $count ? preg_replace('/(\d+)/e', "intval('$1') + 1", $count) : "_2";
 	}
-	return "$name$count.$ext";
+	return "$new_name$count.$ext";
 }
 
 /* ==================================================
@@ -909,7 +925,7 @@ private function save_image($filepath, $type, $image_string, $rotation) {
 				@unlink($filepath);
 				throw new KE_Error(sprintf(__('Invalid image type "%1$s" for file: %2$s', 'ktai_entry_log'), $mimetype, $filepath));
 			}
-			$this->debug_print(sprintf(__('Image without rotation: %1$dx%2$d type:%3$s', 'ktai_entry_log'), $width, $height, $type));
+			$this->base->debug_print(sprintf(__('Image without rotation: %1$dx%2$d type:%3$s', 'ktai_entry_log'), $width, $height, $type));
 		} else {
 			$rotated = $this->rotate_image($image, $type, $rotation, $filepath);
 			if (is_ke_error($rotated)) {
@@ -920,7 +936,7 @@ private function save_image($filepath, $type, $image_string, $rotation) {
 				throw new KE_Error(sprintf(__("Can't chmod the file: %s", 'ktai_entry_log'), $filepath));
 			}
 			imagedestroy($rotated);
-			$this->debug_print(sprintf(__('Image with rotation(%1$s): %2$dx%3$d type:%4$s', 'ktai_entry_log'), $rotation, $width, $height, $type));
+			$this->base->debug_print(sprintf(__('Image with rotation(%1$s): %2$dx%3$d type:%4$s', 'ktai_entry_log'), $rotation, $width, $height, $type));
 		}
 		imagedestroy($image);
 		return self::SUCCESS;
@@ -973,8 +989,8 @@ private function postdate_from_image(&$post_data, $image_num, $post_name_assign)
 	if (function_exists('exif_read_data')) {
 		$exif = exif_read_data($img[0]['file'], 'FILE');
 		if (isset($exif['DateTimeOriginal']) && ($timestamp = @strtotime($exif['DateTimeOriginal'])) > 0) {
-			$this->set_post_date($post_data, $timestamp, array_keys((array) $this->attachments), $image_num);
-			$this->debug_print(sprintf(__('Post date "%1$s" by EXIF of image: %2$s', 'ktai_entry_log'), $post_data['post_date'], $img[0]['name']));
+			$this->set_post_date($post_data, $timestamp, array_keys((array) $this->attachments), $image_num, $post_name_assign);
+			$this->base->debug_print(sprintf(__('Post date "%1$s" by EXIF of image: %2$s', 'ktai_entry_log'), $post_data['post_date'], $img[0]['name']));
 		}
 	} else {
 		$this->log_error(__('EXIF functions not available.', 'ktai_entry_log'));
@@ -983,7 +999,9 @@ private function postdate_from_image(&$post_data, $image_num, $post_name_assign)
 	// Read the date and time from the filename
 	$filename = preg_replace('/\.[^.]*$/', '', basename($img[0]['file']));
 	$century = sprintf('%02d', intval(date('Y') / 100));
-	if (preg_match('/^(\d\d)(\d\d)(\d\d)_(\d\d)(\d\d)(~(\d+)(-\d+)?)?(~\d\d)?$/', $filename, $t)) {
+	if (preg_match('/^(\d\d)(\d\d)(\d\d)_(\d\d)(\d\d)(\d\d)?$/', $filename, $t)) {
+		$timestamp = mktime($t[4], $t[5], (isset($t[6]) ? $t[6] : 0), $t[2], $t[3], $t[1]);
+	} elseif (preg_match('/^(\d\d)(\d\d)(\d\d)_(\d\d)(\d\d)(~(\d+)(-\d+)?)?(~\d\d)?$/', $filename, $t)) {
 		$timestamp = mktime($t[4], $t[5], (isset($t[6]) ? $t[7] : 0), $t[2], $t[3], $t[1]);
 	} elseif (preg_match('/^(\d\d)-(\d\d)-(\d\d)_(\d\d)-(\d\d)(~(\d\d))?$/', $filename, $t)) {
 		$timestamp = mktime($t[4], $t[5], (isset($t[6]) ? $t[7] : 0), $t[2], $t[3], $t[1]);
@@ -991,8 +1009,8 @@ private function postdate_from_image(&$post_data, $image_num, $post_name_assign)
 		$timestamp = mktime($t[4], $t[5], (isset($t[7]) ? $t[6] : 0), $t[2], $t[3], $t[1]);
 	}
 	if ($timestamp) {
-		$this->set_post_date($post_data, $timestamp, array_keys((array) $this->attachments), $image_num);
-		$this->debug_print(sprintf(__('Post date "%1$s" by filename of image: %2$s', 'ktai_entry_log'), $post_data['post_date'], $img['name']));
+		$this->set_post_date($post_data, $timestamp, array_keys((array) $this->attachments), $image_num, $post_name_assign);
+		$this->base->debug_print(sprintf(__('Post date "%1$s" by filename of image: %2$s', 'ktai_entry_log'), $post_data['post_date'], $img['name']));
 	}
 	return;
 }
@@ -1029,7 +1047,7 @@ private function images_to_html($post_content) {
 		return $post_content;
 	}
 	$image_html = array();
-	$size = ($this->get_option('ke_thumb_size') == 'medium') ? 'medium' : 'thumbnail';
+	$size = ($this->base->get_option('ke_thumb_size') == 'medium') ? 'medium' : 'thumbnail';
 	foreach ($this->attachments as $id => $img) {
 		if (! $id) continue;
 		$html = wp_get_attachment_link($id, $size);
@@ -1047,11 +1065,11 @@ private function images_to_html($post_content) {
 		}
 	}
 	if (count($image_html)) {
-		$post_template = $this->get_option('ke_post_template');
+		$post_template = $this->base->get_option('ke_post_template');
 		if (strpos($post_template, KTAI_TEMPLATE_IMAGES) === false) {
 			$post_template .= KTAI_TEMPLATE_IMAGES;
 		}
-		$alignment = $this->get_option('ke_image_alignment');
+		$alignment = $this->base->get_option('ke_image_alignment');
 		$trans = array(
 			KTAI_TEMPLATE_TEXT      => $post_content, 
 			KTAI_TEMPLATE_IMAGES    => implode(KTAI_TEMPLATE_IMAGE_SEPALATOR, $image_html),

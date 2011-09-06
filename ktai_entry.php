@@ -2,7 +2,7 @@
 /*
 Plugin Name: Ktai Entry
 Plugin URI: http://wordpress.org/extend/plugins/ktai-entry/
-Version: 0.9.0.1
+Version: 0.9.1
 Description: Create a new post from a mail message sent by mobile phones.
 Author: IKEDA Yuriko
 Author URI: http://en.yuriko.net/
@@ -125,7 +125,7 @@ public function get($key) {
 public function load_textdomain() {
 	if (! $this->textdomain_loaded) {
 		load_plugin_textdomain('ktai_entry', false, $this->get('plugin_dir') . self::DOMAIN_PATH);
-//		load_plugin_textdomain('ktai_entry_log', false, $this->get('plugin_dir') . self::$domain_path);
+//		load_plugin_textdomain('ktai_entry_log', false, $this->get('plugin_dir') . self::DOMAIN_PATH);
 		$this->textdomain_loaded = true;
 	}
 }
@@ -470,7 +470,7 @@ public function notify_publish($post_id) {
 }
 
 /* ==================================================
- * @param	string  $notify_list
+ * @param	string  $list
  * @return	array	$notify_ids
  * @since   0.9.0
  */
@@ -493,9 +493,9 @@ protected function extract_notify_admins($list) {
  * @since   0.9.0
  */
 protected function get_admin_users() {
-	if (! isset($this->admin_id) || ! is_array($this->admin_ids)) {
+	if ( !isset($this->admin_id) || !is_array($this->admin_ids) ) {
 		global $wpdb;
-		$this->admin_ids = $wpdb->get_col("SELECT user_id FROM `$wpdb->usermeta` WHERE meta_key = '{$wpdb->prefix}user_level' AND meta_value = 10 ORDER BY user_id ASC");
+		$this->admin_ids = $wpdb->get_col("SELECT user_id FROM `{$wpdb->usermeta}` WHERE meta_key = '{$wpdb->prefix}user_level' AND meta_value = 10 ORDER BY user_id ASC");
 	}
 	return $this->admin_ids;
 }
@@ -869,11 +869,21 @@ private function upate_options() {
 			update_option('ke_thumb_size', $thumb_size);
 		}
 	}
+
 	if (isset($_POST['ke_post_template'])) {
 		update_option('ke_post_template', stripslashes(str_replace("\r\n", "\n", $_POST['ke_post_template'])));
 	} else {
 		delete_option('ke_post_template');
 	}
+
+	if (isset($_POST['ke_notify_publish']) && is_array($_POST['ke_notify_publish']) && count($_POST['ke_notify_publish']) >= 1 ) {
+		$notify_users = implode(',', $_POST['ke_notify_publish']);
+		$notify_ids = $this->extract_notify_admins($notify_users);
+		update_option('ke_notify_publish', implode(',', $notify_ids) );
+	} else {
+		delete_option('ke_notify_publish');
+	}
+
 	return;
 }
 

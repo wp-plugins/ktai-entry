@@ -10,10 +10,11 @@
    ================================================== */
 
 class KtaiEntry_Operator {
-	private $base;
+	public $base; // needs public when called by hook
 
 /* ==================================================
  * @param	string   $address
+ * @param	string   $method
  * @return	none
  */
 public static function factory($address, $method) {
@@ -51,12 +52,13 @@ public static function factory($address, $method) {
 }
 
 /* ==================================================
- * @param	none
+ * @param	object   $mailpost
  * @return	none
  */
 public function __construct() {
 	global $Ktai_Entry;
 	$this->base = $Ktai_Entry;
+	return;
 }
 
 /* ==================================================
@@ -67,9 +69,10 @@ public function __construct() {
 protected function pickup_iso_pictograms($buffer, $encoding, $pictograms) {
 	if ($encoding == 'auto') {
 		$encoding = $this->base->encode->guess($buffer);
-		KtaiEntry::logging("Detect content encoding as '$encoding' to pickup pictgrams.");
+		$this->base->logging("Detect content encoding as '$encoding' to pickup pictgrams.");
 	}
 	if ( $this->base->encode->similar($encoding, 'ISO-2022-JP') ) {
+		$this->base->debug_print(__('Pictogram encoding is ISO-2022-JP.', 'ktai_entry_log'));
 		for ($offset = 0 , $replace = 'X' ;
 			 preg_match('/\x1b\$B([\x21-\x7e]+)\x1b\(B/', $buffer, $sequence, PREG_OFFSET_CAPTURE, $offset); //)
 			 $offset += strlen($replace)) 
@@ -95,14 +98,16 @@ protected function pickup_iso_pictograms($buffer, $encoding, $pictograms) {
 
 /* ==================================================
  * @param	string   $buffer
- * @param	string   $charset
+ * @param	string   $encoding
+ * @param	array    $pictograms
  * @return	string   $buffer
  */
-protected function pickup_docomo_sjis($buffer, $charset, $pictograms) {
+protected function pickup_docomo_sjis($buffer, $encoding, $pictograms) {
+	$GLOBALS['pictograms'] = $pictograms; // pass $pictograms to eval scope of mb_ereg_replace/preg_replace
 	$replaced = $this->base->encode->replace(
 		"([\xf8\x40-\xf8\x5b]|[\xf8\x5d-\xf8\xfc]|[\xf9\x40-\xf9\x5b]|[\xf9\x5d-\xf9\xfc])", 
-		'isset($pictograms["\1"]) ? 
-		"<img localsrc=\"" . $pictograms["\1"] . "\" />" : 
+		'isset($GLOBALS["pictograms"]["\1"]) ? 
+		"<img localsrc=\"" . $GLOBALS["pictograms"]["\1"] . "\" />" : 
 		"<img localsrc=\"d\" alt=\"" . "[0x" . bin2hex("\1") . "]\" />"', 
 		$buffer, 'SJIS-win', 'e');
 	if ($replaced) {
@@ -114,14 +119,16 @@ protected function pickup_docomo_sjis($buffer, $charset, $pictograms) {
 
 /* ==================================================
  * @param	string   $buffer
- * @param	string   $charset
+ * @param	string   $encoding
+ * @param	array    $pictograms
  * @return	string   $buffer
  */
-protected function pickup_sbm_sjis($buffer, $charset, $pictograms) {
+protected function pickup_sbm_sjis($buffer, $encoding, $pictograms) {
+	$GLOBALS['pictograms'] = $pictograms; // pass $pictograms to eval scope of mb_ereg_replace/preg_replace
 	$replaced = $this->base->encode->replace(
 		"([\xf7\x40-\xf7\x5b]|[\xf7\x5d-\xf7\xfc]|[\xf9\x40-\xf9\x5b]|[\xf9\x5d-\xf9\xfc]|[\xfb\x40-\xfb\x5b]|[\xfb\x5d-\xfb\xfc])", 
-		'isset($pictograms["\1"]) ? 
-		"<img localsrc=\"" . $pictograms["\1"] . "\" />" : 
+		'isset($GLOBALS["pictograms"]["\1"]) ? 
+		"<img localsrc=\"" . $GLOBALS["pictograms"]["\1"] . "\" />" : 
 		"<img localsrc=\"se\" alt=\"" . "[0x" . bin2hex("\1") . "]\" />"', 
 		$buffer, 'SJIS-win', 'e');
 	if ($replaced) {
@@ -787,11 +794,11 @@ class KtaiEntry_EZweb extends KtaiEntry_Operator {
 
 /* ==================================================
  * @param	string   $buffer
- * @param	string   $charset
+ * @param	string   $encoding
  * @return	string   $buffer
  */
-public function pickup_pictograms($buffer, $charset) {
-	return $this->pickup_iso_pictograms($buffer, $charset, self::$pictograms_iso);
+public function pickup_pictograms($buffer, $encoding) {
+	return $this->pickup_iso_pictograms($buffer, $encoding, self::$pictograms_iso);
 }
 
 // ===== End of class ====================
@@ -1065,7 +1072,8 @@ class KtaiEntry_imode_SJIS extends KtaiEntry_Operator {
  */
 public function pickup_pictograms($buffer, $encoding) {
 	if ( $this->base->encode->similar($encoding, 'Shift_JIS') ) {
-		$buffer = $this->pickup_docomo_sjis($buffer, $charset, self::$pictograms_sjis);
+		$this->base->debug_print(__('Pictogram encoding is Shift_JIS.', 'ktai_entry_log'));
+		$buffer = $this->pickup_docomo_sjis($buffer, $encoding, self::$pictograms_sjis);
 	}
 	return $buffer;
 }
@@ -1264,6 +1272,8 @@ public function pickup_pictograms($buffer, $encoding) {
    ================================================== */
 
 class KtaiEntry_EMNet extends KtaiEntry_imode_SJIS {
+
+// ===== End of class ====================
 }
 
 /* ==================================================
@@ -1529,8 +1539,8 @@ class KtaiEntry_imode_ISO extends KtaiEntry_Operator {
 
 /* ==================================================
  * @param	string   $buffer
- * @param	string   $charset
- * @return	string   $encoding
+ * @param	string   $encoding
+ * @return	string   $buffer
  */
 public function pickup_pictograms($buffer, $encoding) {
 	return $this->pickup_iso_pictograms($buffer, $encoding, self::$pictograms_iso);
@@ -2552,6 +2562,7 @@ class KtaiEntry_SoftBank_SJIS extends KtaiEntry_Operator {
  */
 public function pickup_pictograms($buffer, $encoding) {
 	if ( $this->base->encode->similar($encoding, 'Shift_JIS') ) {
+		$this->base->debug_print(__('Pictogram encoding is Shift_JIS.', 'ktai_entry_log'));
 		$buffer = $this->pickup_sbm_sjis($buffer, $encoding, self::$pictograms_sjis);
 	}
 	return $buffer;

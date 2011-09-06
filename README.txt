@@ -3,7 +3,7 @@ Contributors: lilyfan
 Tags: email, post, post by email, mobile, keitai, japan, pictogram
 Requires at least: 2.6
 Tested up to: 3.2.1
-Stable tag: 0.9.0.1
+Stable tag: 0.9.1
 
 "Ktai Entry" is a plugin to post to WordPress by email. You can attach images and/or use pictograms in the message.
 
@@ -135,6 +135,12 @@ To get support for this plugin, please contact below methods:
 1. Post WordPress forum with 'ktai-entry' tag.
 
 == Changelog ==
+
+= 0.9.1 (2010-09-07) =
+* When changing the post date time into the date time of the specified attached file, the plugin recognizes a date time format `yymmdd_hhiiss` of the image filename.
+* Replace the attachment filename to `Ymd_His.jpg` format if the original name is 'image.jpg' or 'photo.jpg'
+* Fixed a issue that mobile pictograms are not recognized. (For version 0.9.0.x only)
+* Fixed a issue that nofity settings are not saved at Ktai Entry admin panel.
 
 = 0.9.0.1 (2010-09-02) =
 * Fixed a issue on a mail with attached images. (For version 0.9.0 only)

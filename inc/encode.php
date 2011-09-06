@@ -250,13 +250,11 @@ private function get_mime_text_part(&$contents, $part) {
 			$this->base->debug_print(sprintf(__('Skipped %1$s/%2$s part.', 'ktai_entry_log'), $part->ctype_primary, $part->ctype_secondary));
 			return;
 	}
-	if (is_object($this->base->operator)) {
-		$text = $this->base->operator->pickup_pictograms($text, $encoding);
-	}
 	if ($encoding == 'auto') {
 		$encoding = self::$detect_order;
 	}
-	$this->base->debug_print(sprintf(__('Detect text/%1$s part encoding as "%2$s"', 'ktai_entry_log'), $part->ctype_secondary, $charset));
+	$this->base->debug_print(sprintf(__('Detect text/%1$s part encoding as "%2$s"', 'ktai_entry_log'), $part->ctype_secondary, $encoding));
+	$text = apply_filters('ktai_checked_mime_text', $text, $encoding); // pickup pictograms
 	$text = $this->convert_from_mobile($text, $encoding);
 	switch (strtolower($part->ctype_secondary)) {
 		case 'x-pmaildx':
@@ -461,7 +459,8 @@ public function convert($buffer, $out_encoding = 'UTF-8', $in_encoding = 'auto')
  * @param	string  $bufpatternfer
  * @param	string  $replacement
  * @param	string  $target
- * @return	string  $option
+ * @param	string  $option
+ * @return	string  $replaced
  * @since 0.9.0
  */
 public function replace($pattern, $replacement, $target, $encoding = '', $option = NULL) {
@@ -605,7 +604,8 @@ public function convert($buffer, $out_encoding = 'UTF-8', $in_encoding = 'auto')
  * @param	string  $bufpatternfer
  * @param	string  $replacement
  * @param	string  $target
- * @return	string  $option
+ * @param	string  $option
+ * @return	string  $replaced
  * @since 0.9.0
  */
 public function replace($pattern, $replacement, $target, $encoding = '', $option = NULL) {
