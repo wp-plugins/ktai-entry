@@ -63,15 +63,6 @@ public function __construct($base) {
 
 /* ==================================================
  * @param	string  $key
- * @return	mixed   $value
- * @since 0.9.0
- */
-public function get($key) {
-	return $this->$key;
-}
-
-/* ==================================================
- * @param	string  $key
  * @param	mixed   $value
  * @return	none
  * @since 0.9.0
@@ -252,7 +243,7 @@ private function get_mime_text_part(&$contents, $part) {
 			return;
 	}
 	if ($encoding == 'auto') {
-		$encoding = self::$detect_order;
+		$encoding = $this->get('detect_order');
 	}
 	$this->base->debug_print(sprintf(__('Detect text/%1$s part encoding as "%2$s"', 'ktai_entry_log'), $part->ctype_secondary, $encoding));
 	$text = apply_filters('ktai_checked_mime_text', $text, $encoding); // pickup pictograms for SJIS
@@ -355,6 +346,19 @@ public function __construct($base) {
 }
 
 /* ==================================================
+ * @param	string  $key
+ * @return	mixed   $value
+ * @since 0.9.0
+ */
+public function get($key) {
+	if ($key == 'detect_order') {
+		return apply_filters('ktai_detect_order', self::$detect_order); // must be at child class
+	} else {
+		return $this->$key;
+	}
+}
+
+/* ==================================================
  * @param	string  $encoding
  * @param	boolean $loose
  * @return	string  $encoding
@@ -391,7 +395,7 @@ public function normalize($encoding, $loose = false) {
  */
 public function check($buffer, $encoding) {
 	if ($encoding == 'auto') {
-		$encoding = $this->guess($buffer, prent::DISALLOW_AUTO);
+		$encoding = $this->guess($buffer, parent::DISALLOW_AUTO);
 	}
 	if ($this->similar($encoding, 'SJIS')) {
 		$result = mb_check_encoding($buffer, 'SJIS') || mb_check_encoding($buffer, 'SJIS-win');
@@ -429,10 +433,9 @@ public function guess_from_http($allow_auto = false) {
  * @since 0.9.0
  */
 public function guess($input, $allow_auto = false) {
-	$default = $this->input_encoding ? $this->input_encoding : $this->original_internal_encoding;
-	$detect_order = apply_filters('ktai_detect_order', self::$detect_order);
+	$default = $this->input_encoding ? $this->input_encoding : $this->original_encoding;
 	if ( $input ) {
-		$encoding = mb_detect_encoding($input, $detect_order);
+		$encoding = mb_detect_encoding($input, $this->get('detect_order'));
 		if ( $allow_auto && $encoding == 'ASCII' ) {
 			$encoding = 'auto';
 		}
@@ -485,6 +488,19 @@ class KtaiMailEncode_iconv extends KtaiMailEncode {
 public function __construct($base) {
 	parent::__construct($base);
 	$this->original_encoding = $this->blog_encoding;
+}
+
+/* ==================================================
+ * @param	string  $key
+ * @return	mixed   $value
+ * @since 0.9.0
+ */
+public function get($key) {
+	if ($key == 'detect_order') {
+		return apply_filters('ktai_detect_order', self::$detect_order); // must be at child class
+	} else {
+		return $this->$key;
+	}
 }
 
 /* ==================================================
@@ -569,7 +585,7 @@ public function guess($input, $allow_auto = false) {
 	$default = $this->input_encoding ? $this->input_encoding : $this->original_encoding;
 	if ( $input ) {
 		$encoding = NULL;
-		$detect_order = apply_filters('ktai_detect_order', self::$detect_order);
+		$detect_order = $this->get('detect_order');
 		foreach ($detect_order as $enc) {
 			$enc = $this->normalize($enc);
 			$converted = iconv($enc, $enc . '//IGNORE', $buffer);
