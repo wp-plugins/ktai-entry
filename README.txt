@@ -136,6 +136,9 @@ To get support for this plugin, please contact below methods:
 
 == Changelog ==
 
+= 0.9.1.2 (2010-09-30) =
+* Fixed an issue of messages with unspecified encodings.
+
 = 0.9.1.1 (2010-09-14) =
 * Fixed an issue of skipping the content with Yahoo! mail.
 
