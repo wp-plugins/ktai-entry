@@ -3,7 +3,7 @@ Contributors: lilyfan
 Tags: email, post, post by email, mobile, keitai, japan, pictogram
 Requires at least: 2.6
 Tested up to: 3.2.1
-Stable tag: 0.9.1
+Stable tag: 0.9.1.1
 
 "Ktai Entry" is a plugin to post to WordPress by email. You can attach images and/or use pictograms in the message.
 
@@ -136,7 +136,10 @@ To get support for this plugin, please contact below methods:
 
 == Changelog ==
 
-= 0.9.1.1 (2010-09-07) =
+= 0.9.1.2 (2010-09-30) =
+* Fixed an issue of messages with unspecified encodings.
+
+= 0.9.1.1 (2010-09-14) =
 * Fixed an issue of skipping the content with Yahoo! mail.
 
 = 0.9.1 (2010-09-07) =
